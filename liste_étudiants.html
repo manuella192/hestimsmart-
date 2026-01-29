@@ -1,0 +1,84 @@
+<!-- HTML5 & CSS3 Version -->
+<!-- ===================== -->
+<!-- Section 1: HTML Structure -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HESTIM Admin UI</title>
+    <link rel="stylesheet" href="portails.css" />
+</head>
+<body>
+    <header class="header">
+        <img src="logo_hestim arrière plan bleu.png" alt="HESTIM Logo" class="logo" />
+        <h1>Bienvenue sur le portail Administrateur</h1>
+        <button class="logout-btn" onclick="location.href='login-enseignant.html'">Déconnexion</button>
+    </header>
+
+    <main class="main-container">
+        <nav class="navbar">
+    <button class="nav-btn" onclick="location.href='portail_admin..html'">Salles</button>
+    <button class="nav-btn active" onclick="location.href='etudiants_inscrits.html'">Étudiants Inscrits</button>
+    <button class="nav-btn" onclick="location.href='ajout_cours.html'">Ajouter un cours</button>
+</nav>
+<div class="sub-menu">
+    <button class="sub-btn" onclick="location.href='ajout_etudiant.html'">Ajouter un étudiant</button>
+    <button class="sub-btn active" onclick="location.href='etudiants_inscrits.html'">Liste des étudiants</button>
+</div>
+        <section class="content-box">
+            <h2>Liste des étudiants</h2>
+              <div class="classe-tag">Cycle ingénieur Informatique 1ère année</div>
+            <ul class="student-list">
+                <li>Manuella MEHINTO</li>
+                <li>Jane ONDAYE</li>
+                <li>Abdel ISSIFOU</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="footer">
+
+  
+    <div class="footer-line"></div>
+
+    <div class="footer-wrapper">
+
+      
+        <div class="footer-col">
+            <h4>Nos formations</h4>
+            <a href=""><p>Formation initiale</p></a>
+           <a href=""> <p>Formation Continue</p></a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contactez-nous</h4>
+            <a href=""><p><i class="fa-solid fa-phone"></i> +212 670000000</p></a>
+            <a href=""><p><i class="fa-solid fa-phone"></i> +212 522000000</p></a>
+            <a href=""><p><i class="fa-solid fa-envelope"></i> contact@hestim.ma</p></a>
+        </div>
+
+        
+        <div class="footer-col">
+            <h4>HESTIM</h4>
+            <a href=""><p>A propos de HESTIM</p></a>
+
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+
+    </div>
+   
+    <div class="footer-line"></div>
+ Copyright © 2023 HESTIM
+    <div class="footer-bottom">
+        
+    </div>
+
+</footer>
+</body>
+</html>

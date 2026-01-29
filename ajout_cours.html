@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un cours - Portail Administrateur</title>
+    <link rel="stylesheet" href="portails.css">
+</head>
+<body>
+
+<header class="header">
+    <img src="logo_hestim arrière plan bleu.png" class="logo">
+    <h1>Bienvenue sur le portail Administrateur</h1>
+    <button class="logout-btn" onclick="location.href='login-enseignant.html'">Déconnexion</button>
+</header>
+
+<nav class="navbar">
+    <button class="nav-btn" onclick="location.href='portail_admin..html'">Salles</button>
+    <button class="nav-btn" onclick="location.href='etudiants_inscrits.html'">Étudiants Inscrits</button>
+    <button class="nav-btn active">Ajouter un cours</button>
+</nav>
+
+<section class="content">
+    <div class="form-container">
+        <h2>Ajouter un nouveau cours</h2>
+        
+        <form id="coursForm" class="cours-form" onsubmit="ajouterCours(event)">
+            <div class="form-group">
+                <label for="nomCours">Nom du cours *</label>
+                <input type="text" id="nomCours" name="nomCours" placeholder="Ex: Algorithmes et structures de données" required>
+            </div>
+
+            <div class="form-group">
+                <label for="codeCours">Code du cours *</label>
+                <input type="text" id="codeCours" name="codeCours" placeholder="Ex: INF101" required pattern="[A-Z]{3}[0-9]{3}">
+                <small>Format: 3 lettres majuscules suivies de 3 chiffres</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="filiere">Filière *</label>
+                    <select id="filiere" name="filiere" required>
+                        <option value="">Sélectionnez une filière</option>
+                        <option value="Informatique">Informatique</option>
+                        <option value="Génie Civil">Génie Civil</option>
+                        <option value="Ingénierie Industrielle">Ingénierie Industrielle</option>
+                        <option value="Finance">Finance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="niveau">Niveau des étudiants *</label>
+                    <select id="niveau" name="niveau" required>
+                        <option value="">Sélectionnez un niveau</option>
+                        <option value="1ère année">1ère année</option>
+                        <option value="2ème année">2ème année</option>
+                        <option value="3ème année">3ème année</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="effectif">Effectif des étudiants *</label>
+                    <input type="number" id="effectif" name="effectif" min="1" max="200" placeholder="Nombre d'étudiants" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="heures">Nombre d'heures requis *</label>
+                    <input type="number" id="heures" name="heures" min="1" max="200" placeholder="Nombre d'heures" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="enseignant">Enseignant responsable</label>
+                <select id="enseignant" name="enseignant">
+                    <option value="">Sélectionnez un enseignant</option>
+                    <option value="Prof. Ahmed BENALI">Prof. Ahmed BENALI</option>
+                    <option value="Prof. Fatima ALAMI">Prof. Fatima ALAMI</option>
+                    <option value="Prof. Mohamed CHERKAOUI">Prof. Mohamed CHERKAOUI</option>
+                    <option value="Prof. Aicha EL FASSI">Prof. Aicha EL FASSI</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="salle">Type de salle requis</label>
+                <select id="salle" name="salle">
+                    <option value="">Sélectionnez un type</option>
+                    <option value="Amphithéâtre">Amphithéâtre</option>
+                    <option value="Salle de cours">Salle de cours</option>
+                    <option value="Salle info">Salle info</option>
+                    <option value="Laboratoire">Laboratoire</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description du cours</label>
+                <textarea id="description" name="description" rows="4" placeholder="Décrivez le contenu et les objectifs du cours..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="annulerFormulaire()">Annuler</button>
+                <button type="submit" class="btn-submit">Enregistrer le cours</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="cours-list-container" id="coursListContainer" style="display: none;">
+        <h3>Cours ajoutés récemment</h3>
+        <div id="coursList"></div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-line"></div>
+    <div class="footer-wrapper">
+        <div class="footer-col">
+            <h4>Nos formations</h4>
+            <a href=""><p>Formation initiale</p></a>
+            <a href=""><p>Formation Continue</p></a>
+        </div>
+        <div class="footer-col">
+            <h4>Contactez-nous</h4>
+            <a href=""><p><i class="fa-solid fa-phone"></i> +212 670000000</p></a>
+            <a href=""><p><i class="fa-solid fa-phone"></i> +212 522000000</p></a>
+            <a href=""><p><i class="fa-solid fa-envelope"></i> contact@hestim.ma</p></a>
+        </div>
+        <div class="footer-col">
+            <h4>HESTIM</h4>
+            <a href=""><p>A propos de HESTIM</p></a>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-line"></div>
+    Copyright © 2023 HESTIM
+    <div class="footer-bottom"></div>
+</footer>
+
+<script>
+    let coursList = [];
+
+    function ajouterCours(event) {
+        event.preventDefault();
+        
+        const formData = {
+            nom: document.getElementById('nomCours').value,
+            code: document.getElementById('codeCours').value,
+            filiere: document.getElementById('filiere').value,
+            niveau: document.getElementById('niveau').value,
+            effectif: document.getElementById('effectif').value,
+            heures: document.getElementById('heures').value,
+            enseignant: document.getElementById('enseignant').value,
+            salle: document.getElementById('salle').value,
+            description: document.getElementById('description').value
+        };
+
+        // Ajouter le cours à la liste
+        coursList.push({
+            ...formData,
+            id: Date.now(),
+            dateAjout: new Date().toLocaleDateString('fr-FR')
+        });
+
+        // Afficher un message de succès
+        alert(`Cours "${formData.nom}" ajouté avec succès!`);
+        
+        // Réinitialiser le formulaire
+        document.getElementById('coursForm').reset();
+        
+        // Afficher la liste des cours
+        afficherCoursList();
+    }
+
+    function afficherCoursList() {
+        const container = document.getElementById('coursListContainer');
+        const list = document.getElementById('coursList');
+        
+        if (coursList.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'block';
+        list.innerHTML = '';
+
+        coursList.slice(-5).reverse().forEach(cours => {
+            const coursCard = document.createElement('div');
+            coursCard.className = 'cours-card';
+            coursCard.innerHTML = `
+                <div class="cours-card-header">
+                    <h4>${cours.nom} (${cours.code})</h4>
+                    <span class="cours-date">Ajouté le ${cours.dateAjout}</span>
+                </div>
+                <div class="cours-card-body">
+                    <p><strong>Filière:</strong> ${cours.filiere} - ${cours.niveau}</p>
+                    <p><strong>Effectif:</strong> ${cours.effectif} étudiants | <strong>Heures:</strong> ${cours.heures}h</p>
+                    ${cours.enseignant ? `<p><strong>Enseignant:</strong> ${cours.enseignant}</p>` : ''}
+                    ${cours.salle ? `<p><strong>Type de salle:</strong> ${cours.salle}</p>` : ''}
+                </div>
+            `;
+            list.appendChild(coursCard);
+        });
+    }
+
+    function annulerFormulaire() {
+        if (confirm('Êtes-vous sûr de vouloir annuler ? Les données non enregistrées seront perdues.')) {
+            document.getElementById('coursForm').reset();
+        }
+    }
+
+    // Validation du code cours en temps réel
+    document.getElementById('codeCours').addEventListener('input', function(e) {
+        const code = e.target.value.toUpperCase();
+        e.target.value = code;
+        
+        if (code.length > 0 && !/^[A-Z]{0,3}[0-9]{0,3}$/.test(code)) {
+            e.target.setCustomValidity('Format invalide: 3 lettres suivies de 3 chiffres');
+        } else {
+            e.target.setCustomValidity('');
+        }
+    });
+</script>
+
+</body>
+</html>

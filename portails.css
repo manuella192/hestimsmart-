@@ -1,0 +1,838 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #0b1a42;
+}
+
+.header {
+    background: #131564;
+    padding: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    height: 60px;
+}
+
+.logout-btn {
+    padding: 10px 20px;
+    border: none;
+    background: white;
+    color: #0b2d72;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.navbar {
+    background: white;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-btn {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    background: #d8e1f5;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.nav-btn.active {
+    background: #2c5eff;
+    color: white;
+}
+
+.content {
+    padding: 30px;
+}
+
+.classe-tag {
+    background: #0b2d72;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.students-list li {
+    font-size: 18px;
+    margin: 12px 0;
+}
+
+.add-btn {
+    margin-top: 25px;
+    padding: 15px 25px;
+    background: #2c5eff;
+    color: white;
+    border-radius: 10px;
+    border: none;
+}
+
+.sub-menu {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+}
+
+.sub-btn {
+    padding: 10px 20px;
+    background: #d8e1f5;
+    border-radius: 10px;
+    border: none;
+}
+
+.sub-btn.active {
+    background: #0b2d72;
+    color: white;
+}
+
+.emploi-container {
+    padding: 20px;
+}
+
+.emploi-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0b2d72;
+    color: white;
+}
+
+.emploi-table td, .emploi-table th {
+    border: 1px solid #394d82;
+    padding: 14px;
+}
+
+.salles-container {
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.salle-card {
+    background: #dfe7ff;
+    padding: 20px;
+    border-radius: 15px;
+    width: 220px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.card-actions button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    flex: 1;
+    min-width: 70px;
+}
+
+/* Style pour les boutons dans les cartes même sans card-actions */
+.salle-card button {
+    margin: 5px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Espacement entre les boutons dans les cartes */
+.salle-card > button + button {
+    margin-left: 10px;
+}
+
+.reservations-container {
+    padding: 20px;
+    background: white;
+    margin: 20px;
+    border-radius: 10px;
+}
+
+.reservations-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.reservations-header h2 {
+    color: #0b2d72;
+    margin: 0;
+}
+
+.delete-reservation-btn {
+    padding: 12px 24px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.delete-reservation-btn:hover {
+    background: #c82333;
+}
+
+.reservations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reservation-item {
+    background: #f5f7fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #2c5eff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reservation-item .reservation-info {
+    flex: 1;
+}
+
+.reservation-item .reservation-info strong {
+    color: #0b2d72;
+}
+
+.reservation-item .reservation-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.reservation-item .btn-delete {
+    padding: 8px 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.reservation-item .btn-delete:hover {
+    background: #c82333;
+}
+.footer {
+    background: #ffffff;
+    padding: 25px 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+/* Ligne fine */
+.footer-line {
+    width: 100%;
+    height: 1px;
+    background: #c5c5db;
+    margin: 10px 0;
+}
+
+.footer-wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.footer-col {
+    width: 32%;
+}
+
+.footer-col h4 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.footer-col p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.footer-col i {
+    margin-right: 7px;
+}
+
+/* Icônes sociales */
+.social-icons a {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #0b57a4;
+    transition: 0.3s;
+}
+
+.social-icons a:hover {
+    opacity: 0.7;
+}
+
+/* Section Copyright */
+.footer-bottom {
+    text-align: left;   /* Comme le modèle */
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Styles pour la page Étudiants Inscrits */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.search-filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    padding: 10px 15px;
+    border: 2px solid #d8e1f5;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 250px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2c5eff;
+}
+
+.filter-select {
+    padding: 10px 15px;
+    border: 2px solid #d8e1f5;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #2c5eff;
+}
+
+.students-table-container {
+    background: white;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.students-table thead {
+    background: #0b2d72;
+    color: white;
+}
+
+.students-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.students-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.students-table tbody tr:hover {
+    background: #f5f7fa;
+}
+
+.students-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.btn-view, .btn-edit, .btn-delete {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 5px;
+    transition: all 0.3s;
+}
+
+.btn-view {
+    background: #2c5eff;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #1a4ae6;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: #0b2d72;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.page-btn {
+    padding: 10px 20px;
+    border: 2px solid #d8e1f5;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.page-btn:hover {
+    background: #d8e1f5;
+    border-color: #2c5eff;
+}
+
+/* Styles pour le formulaire Ajouter un cours */
+.form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 900px;
+}
+
+.form-container h2 {
+    color: #0b2d72;
+    margin-bottom: 25px;
+}
+
+.cours-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #0b2d72;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px;
+    border: 2px solid #d8e1f5;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2c5eff;
+}
+
+.form-group small {
+    color: #666;
+    font-size: 12px;
+    margin-top: -5px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.btn-cancel {
+    padding: 12px 24px;
+    border: 2px solid #d8e1f5;
+    background: white;
+    color: #0b2d72;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+    background: #f5f7fa;
+    border-color: #2c5eff;
+}
+
+.btn-submit {
+    padding: 12px 24px;
+    border: none;
+    background: #2c5eff;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    background: #1a4ae6;
+}
+
+.cours-list-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cours-list-container h3 {
+    color: #0b2d72;
+    margin-bottom: 15px;
+}
+
+.cours-card {
+    background: #f5f7fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2c5eff;
+}
+
+.cours-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cours-card-header h4 {
+    color: #0b2d72;
+    margin: 0;
+}
+
+.cours-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.cours-card-body p {
+    margin: 5px 0;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Styles pour la section Réservations Admin */
+.reservations-admin-container {
+    padding: 20px;
+    background: white;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.reservations-filters {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.btn-add-reservation {
+    padding: 12px 24px;
+    background: #2c5eff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-add-reservation:hover {
+    background: #1a4ae6;
+}
+
+.reservations-table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.reservations-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.reservations-table thead {
+    background: #0b2d72;
+    color: white;
+}
+
+.reservations-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.reservations-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+.reservations-table tbody tr:hover {
+    background: #f5f7fa;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Espacement des boutons d'action dans le tableau des réservations */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.reservations-table .action-buttons button {
+    margin: 0;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.modal-header h3 {
+    color: #0b2d72;
+    margin: 0;
+}
+
+.close-modal {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.close-modal:hover {
+    color: #000;
+}
+
+/* Styles pour la page Filières */
+.section-title {
+    color: #0b2d72;
+    padding: 20px;
+    margin: 0;
+}
+
+.track-list {
+    padding: 20px;
+    background: white;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.track-item {
+    padding: 15px;
+    margin: 10px 0;
+    background: #f5f7fa;
+    border-radius: 8px;
+    border-left: 4px solid #2c5eff;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.track-item:hover {
+    background: #e8edf5;
+    transform: translateX(5px);
+}
+
+/* Styles pour liste_étudiants.html */
+.content-box {
+    padding: 20px;
+    background: white;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.student-list {
+    list-style: none;
+    padding: 0;
+}
+
+.student-list li {
+    padding: 15px;
+    margin: 10px 0;
+    background: #f5f7fa;
+    border-radius: 8px;
+    border-left: 4px solid #2c5eff;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.student-list li:hover {
+    background: #e8edf5;
+    transform: translateX(5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-col {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .footer-bottom {
+        text-align: center;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-filter-bar {
+        width: 100%;
+    }
+
+    .search-input {
+        min-width: 100%;
+    }
+
+    .students-table-container {
+        overflow-x: scroll;
+    }
+
+    .form-container {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .reservations-filters {
+        flex-direction: column;
+    }
+
+    .reservations-filters .search-input,
+    .reservations-filters .filter-select {
+        width: 100%;
+    }
+
+    .reservations-table-container {
+        overflow-x: scroll;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+}
