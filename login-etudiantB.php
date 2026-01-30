@@ -1,57 +1,55 @@
 <?php
 session_start();
+require_once __DIR__ . '/db.php';
 
-// Connexion à la base de données Hestimsmart
-$host = "localhost";      // ou 127.0.0.1
-$user = "root";           // ton utilisateur MySQL (par défaut root en local)
-$pass = "";               // ton mot de passe MySQL (vide par défaut en XAMPP/WAMP)
-$dbname = "Hestimsmart";  // nom de ta base
-
-$conn = new pdo($host, $user, $pass, $dbname);
-
-// Vérifier la connexion
-if ($conn->connect_error) {
-    die("Connexion échouée : " . $conn->connect_error);
-}
-
-// Récupérer les données du formulaire
-$email = $_POST['email'] ?? '';
+// Récupérer les données du formulaire (POST)
+$email    = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// Préparer la requête pour éviter les injections SQL
-$stmt = $conn->prepare("SELECT * FROM etudiant WHERE email = ? AND mdp = ?");
-$stmt->bind_param("ss", $email, $password);
-$stmt->execute();
-$result = $stmt->get_result();
+// Petite validation basique
+$email = trim($email);
+$password = trim($password);
 
-// Vérifier si un utilisateur correspond
-if ($result->num_rows > 0) {
-    $_SESSION['email'] =$stmt['email'];
-    
-    header("Location: dashboard.html"); // ✅ redirection si OK
+if ($email === '' || $password === '') {
+    echo "<p>Veuillez remplir tous les champs. <a href='login-etudiant.html'>Réessayer</a></p>";
     exit;
-} else {
-    echo "<p>Identifiants inco rrects. <a href='login-etudiant.html'>Réessayer</a></p>";
-}
-if ($result->num_rows > 0) {
-    $etudiant = $result->fetch_assoc();
-    
-
-
-    // ✅ Redirection vers dashboard.php avec l'email en paramètre GET
-    
-   
- 
-
-    
-   
-
-    exit;
-} else {
-    echo "<p>Identifiants incorrects. <a href='login-etudiant.html'>Réessayer</a></p>";
 }
 
+try {
+    // Requête préparée (anti-injection SQL)
+    $sql = "SELECT `ID-ETUDIANT`, `NOM`, `PRENOM`, `EMAIL`
+            FROM `etudiant`
+            WHERE `EMAIL` = :email AND `MDP` = :mdp
+            LIMIT 1";
 
-$stmt->close();
-$conn->close();
-?>
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        ':email' => $email,
+        ':mdp'   => $password
+    ]);
+
+    $etudiant = $stmt->fetch(); // false si rien trouvé
+
+    if ($etudiant) {
+        // Stocker ce dont tu as besoin en session
+        $_SESSION['etudiant_id'] = $etudiant['ID-ETUDIANT'];
+        $_SESSION['email']       = $etudiant['EMAIL'];
+        $_SESSION['nom']         = $etudiant['NOM'];
+        $_SESSION['prenom']      = $etudiant['PRENOM'];
+
+        // Redirection
+        header("Location: index.php");
+        exit;
+    } else {
+        echo "<p>Identifiants incorrects. <a href='login-etudiant.html'>Réessayer</a></p>";
+        exit;
+    }
+
+} catch (PDOException $e) {
+    // Message générique côté utilisateur
+    echo "<p>Une erreur est survenue. <a href='login-etudiant.html'>Retour</a></p>";
+
+    // Optionnel: log serveur (recommandé)
+    // error_log($e->getMessage());
+    exit;
+}

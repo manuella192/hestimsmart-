@@ -27,8 +27,12 @@
         </div>
         <button class="btn" type="submit">Se connecter</button>
       </form>
+
+      <p>Partie réservée : <a href="login-enseignant.php">enseignants</a> / <a href="login-admin.php">administration</a></p>
+    
     </main>
   </div>
+  <br>
 </body>
 </html>
 
