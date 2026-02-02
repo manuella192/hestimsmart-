@@ -8,11 +8,11 @@
 </head>
 <body>
   <div class="page">
-    <img src="Image1.png" alt="teacher" class="hero" />
+    <img src="images/image2.png" alt="teacher" class="hero" />
     
     <main class="right">
       <header class="brand">
-        <img src="logo_hestim.png" alt="logo" class="logo"/>
+        <img src="images/logo_hestim.png" alt="logo" class="logo"/>
       </header>
 
       <!-- ✅ Formulaire relié au backend -->

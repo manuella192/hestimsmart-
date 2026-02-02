@@ -9,11 +9,11 @@
 </head>
 <body>
   <div class="page">
-    <img src="Image1.png" alt="admin" class="hero" />
+    <img src="images/image2.png" alt="admin" class="hero" />
 
     <main class="right">
       <header class="brand">
-        <img src="logo_hestim.png" alt="logo" class="logo"/>
+        <img src="images/logo_hestim.png" alt="logo" class="logo"/>
       </header>
 
       <form class="form-wrap" method="POST" action="login-adminB.php">

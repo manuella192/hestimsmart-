@@ -28,7 +28,7 @@ $anneeScolaire = $_SESSION['annee_scolaire'] ?? '2025-2026';
 <header class="header">
     <img src="images/logo-hestim.png" class="logo" alt="logo">
     <h1>Bienvenue sur le portail enseignant<?= $fullName ? ' : ' . htmlspecialchars($fullName) : '' ?></h1>
-    <button class="logout-btn" onclick="location.href='logout.php'">Déconnexion</button>
+    <button class="logout-btn" onclick="location.href='deconnexion.php'">Déconnexion</button>
 </header>
 
 <nav class="navbar">
