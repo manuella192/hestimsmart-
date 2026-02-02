@@ -55,3 +55,4 @@ tests/_output/
 tests/_support/_generated/
 phpunit.xml.cache
 composer.lock    
+db.php
