@@ -1,0 +1,58 @@
+# ----------------------------------------
+# Dossiers générés / dépendances
+# ----------------------------------------
+vendor/
+node_modules/
+bower_components/
+
+# ----------------------------------------
+# Fichiers temporaires / caches
+# ----------------------------------------
+*.log
+*.cache
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+
+# ----------------------------------------
+# Environnements / clés / configs sensibles
+# ----------------------------------------
+.env
+.env.local
+.env.*.local
+.env.example  
+venv/
+.venv/
+env/
+. env/
+venv-*/
+env-*/
+
+# ----------------------------------------
+# IDE / éditeurs
+# ----------------------------------------
+.idea/
+.vscode/
+*.sublime-*
+*.code-workspace
+
+# ----------------------------------------
+# Builds / dist / assets compilés
+# ----------------------------------------
+dist/
+build/
+public/build/     # si tu utilises Vite/Mix/Webpack
+storage/framework/views/
+storage/logs/
+
+# ----------------------------------------
+# Autres dossiers souvent ignorés
+# ----------------------------------------
+coverage/
+tests/_output/
+tests/_support/_generated/
+phpunit.xml.cache
+composer.lock    
+db.php
