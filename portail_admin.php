@@ -23,8 +23,13 @@ $adminName = trim(($_SESSION['admin_prenom'] ?? '') . ' ' . ($_SESSION['admin_no
 
 <nav class="navbar">
     <button class="nav-btn active" onclick="showMainSection('salles', event)">Salles</button>
-    <button class="nav-btn" onclick="showMainSection('etudiants', event)">Étudiants Inscrits</button>
+    <button class="nav-btn" onclick="showMainSection('gestion', event)">Gestion utilisateurs</button>
     <button class="nav-btn" onclick="showMainSection('cours', event)">Gestion Cours</button>
+    <!-- NOUVEAU -->
+    <button class="nav-btn" onclick="showMainSection('docs', event)">Demandes documents</button>
+
+    <button class="nav-btn" onclick="showMainSection('edt', event)">Emploi du temps</button>
+
 </nav>
 
 <div id="salles-section">
@@ -83,43 +88,80 @@ $adminName = trim(($_SESSION['admin_prenom'] ?? '') . ' ' . ($_SESSION['admin_no
     </section>
 </div>
 
-<div id="etudiants-section" style="display:none;">
-    <section class="content">
-        <div class="page-header">
-            <h2>Liste des Étudiants</h2>
-            <div class="search-filter-bar">
-                <input type="text" id="searchStudent" class="search-input" placeholder="Rechercher un étudiant...">
-                <select id="filterFiliere" class="filter-select">
-                    <option value="">Toutes les filières</option>
-                </select>
-                <select id="filterNiveau" class="filter-select">
-                    <option value="">Tous les niveaux</option>
-                </select>
-                <button class="btn-add-reservation" onclick="openStudentModal()">+ Nouvel Étudiant</button>
+<div id="gestion-section" style="display:none;">
+    <div class="sub-menu">
+        <button class="sub-btn active" onclick="showGestionSubSection('etudiants', event)">Gestion étudiants</button>
+        <button class="sub-btn" onclick="showGestionSubSection('enseignants', event)">Gestion enseignants</button>
+    </div>
+
+    <!-- === SOUS SECTION ETUDIANTS (ton code actuel inchangé) === -->
+    <div id="gestion-etudiants-subsection">
+        <section class="content">
+            <div class="page-header">
+                <h2>Liste des Étudiants</h2>
+                <div class="search-filter-bar">
+                    <input type="text" id="searchStudent" class="search-input" placeholder="Rechercher un étudiant...">
+                    <select id="filterFiliere" class="filter-select">
+                        <option value="">Toutes les filières</option>
+                    </select>
+                    <select id="filterNiveau" class="filter-select">
+                        <option value="">Tous les niveaux</option>
+                    </select>
+                    <button class="btn-add-reservation" onclick="openStudentModal()">+ Nouvel Étudiant</button>
+                </div>
+                <div id="studentsMsg" style="margin-top:10px;"></div>
             </div>
 
-            <div id="studentsMsg" style="margin-top:10px;"></div>
-        </div>
+            <div class="students-table-container">
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Nom complet</th>
+                            <th>Email</th>
+                            <th>Filière</th>
+                            <th>Niveau</th>
+                            <th>Année</th>
+                            <th>Groupe</th>
+                            <th>Date d'inscription</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 
-        <div class="students-table-container">
-            <table class="students-table">
-                <thead>
-                    <tr>
-                        <th>Nom complet</th>
-                        <th>Email</th>
-                        <th>Filière</th>
-                        <th>Niveau</th>
-                        <th>Année</th>
-                        <th>Groupe</th>
-                        <th>Date d'inscription</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="studentsTableBody"></tbody>
-            </table>
-        </div>
-    </section>
+    <!-- === SOUS SECTION ENSEIGNANTS (nouvelle) === -->
+    <div id="gestion-enseignants-subsection" style="display:none;">
+        <section class="content">
+            <div class="page-header">
+                <h2>Liste des Enseignants</h2>
+                <div class="search-filter-bar">
+                    <input type="text" id="searchTeacher" class="search-input" placeholder="Rechercher un enseignant...">
+                    <button class="btn-add-reservation" onclick="openTeacherModal()">+ Nouvel Enseignant</button>
+                </div>
+
+                <div id="teachersMsg" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="students-table-container">
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Nom complet</th>
+                            <th>Email</th>
+                            <th>Mot de passe</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 </div>
+
 
 <div id="cours-section" style="display:none;">
     <div class="sub-menu">
@@ -243,6 +285,80 @@ $adminName = trim(($_SESSION['admin_prenom'] ?? '') . ' ' . ($_SESSION['admin_no
     </div>
 </div>
 
+<!-- ====================== NOUVEAU : DEMANDES DOCUMENTS ====================== -->
+<div id="docs-section" style="display:none;">
+    <section class="reservations-container">
+        <div class="reservations-header">
+            <h2>Demandes de documents étudiants</h2>
+            <button class="btn-add-reservation" onclick="loadDocDemandes()">Rafraîchir</button>
+        </div>
+
+        <div class="search-filter-bar" style="margin: 10px 0;">
+            <select id="docFilterStatut" class="filter-select" style="max-width:220px;">
+                <option value="">Tous les statuts</option>
+                <option value="non_traite">Non traitée</option>
+                <option value="traitee">Traitée</option>
+                <option value="refusee">Refusée</option>
+            </select>
+            <input type="text" id="docSearch" class="search-input" placeholder="Rechercher (étudiant, email, type, commentaire...)">
+        </div>
+
+        <div id="docDemandesMsg" style="margin:10px 0;"></div>
+        <div id="doc-demandes-list" class="reservations-list"></div>
+    </section>
+</div>
+
+<!-- ====================== NOUVEAU : EMPLOI DU TEMPS ====================== -->
+<?php include __DIR__ . '/sections/edt_form.php'; ?>
+<!-- ====================== FIN NOUVEAU : EMPLOI DU TEMPS ====================== -->
+
+
+<!-- MODAL REFUS DOCUMENT (NOUVEAU) -->
+<div id="docRejectModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Refuser la demande</h3>
+            <span class="close-modal" onclick="closeDocRejectModal()">&times;</span>
+        </div>
+
+        <form id="docRejectForm">
+            <input type="hidden" id="doc_reject_id">
+            <div class="form-group">
+                <label>Motif de refus *</label>
+                <input type="text" id="doc_reject_motif" required placeholder="Ex: Dossier incomplet / paiement non à jour...">
+            </div>
+
+            <div id="docRejectMsg" style="margin:10px 0;"></div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeDocRejectModal()">Annuler</button>
+                <button type="submit" class="btn-submit">Refuser</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL VALIDATION DOCUMENT (NOUVEAU) -->
+<div id="docValidateModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Valider la demande</h3>
+            <span class="close-modal" onclick="closeDocValidateModal()">&times;</span>
+        </div>
+        <div style="padding: 20px 0; font-size: 1.05em;">
+            <p>Voulez-vous vraiment <strong>valider</strong> cette demande ?</p>
+            <p style="margin-top: 12px; color: #555; font-size: 0.95em;">
+                Un email sera envoyé à l’étudiant pour venir récupérer le document au service de scolarité.
+            </p>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closeDocValidateModal()">Annuler</button>
+            <button type="button" class="btn-submit" id="btnDocConfirmValidate">Valider</button>
+        </div>
+    </div>
+</div>
+<!-- ====================== FIN NOUVEAU ====================== -->
+
 <!-- MODAL ÉTUDIANT -->
 <div id="studentModal" class="modal" style="display:none;">
     <div class="modal-content">
@@ -318,6 +434,50 @@ $adminName = trim(($_SESSION['admin_prenom'] ?? '') . ' ' . ($_SESSION['admin_no
         </form>
     </div>
 </div>
+
+<!-- MODAL ENSEIGNANT -->
+<div id="teacherModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="teacherModalTitle">Nouvel Enseignant</h3>
+            <span class="close-modal" onclick="closeTeacherModal()">&times;</span>
+        </div>
+
+        <form id="teacherForm">
+            <input type="hidden" id="teacher_id">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nom *</label>
+                    <input type="text" id="teacher_nom" required>
+                </div>
+                <div class="form-group">
+                    <label>Prénom *</label>
+                    <input type="text" id="teacher_prenom" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="teacher_email" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe *</label>
+                    <input type="text" id="teacher_mdp" required>
+                </div>
+            </div>
+
+            <div id="teacherMsg" style="margin:10px 0;"></div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeTeacherModal()">Annuler</button>
+                <button type="submit" class="btn-submit">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <!-- MODAL CONFIRMATION SUPPRESSION -->
 <div id="confirmModal" class="modal" style="display:none;">
@@ -449,21 +609,52 @@ function showMainSection(section, event) {
     if (event?.target) event.target.classList.add('active');
 
     document.getElementById('salles-section').style.display = 'none';
-    document.getElementById('etudiants-section').style.display = 'none';
+    document.getElementById('gestion-section').style.display = 'none';
     document.getElementById('cours-section').style.display = 'none';
+    // NOUVEAU
+    document.getElementById('docs-section').style.display = 'none';
+    document.getElementById('edt-section').style.display = 'none';
+
 
     if (section === 'salles') {
         document.getElementById('salles-section').style.display = 'block';
         initSalles();
     }
-    if (section === 'etudiants') {
-        document.getElementById('etudiants-section').style.display = 'block';
-        initStudents();
+    if (section === 'gestion') {
+        document.getElementById('gestion-section').style.display = 'block';
+        initGestion(); 
     }
     if (section === 'cours') {
         document.getElementById('cours-section').style.display = 'block';
         initCours();
     }
+    // NOUVEAU
+    if (section === 'docs') {
+        document.getElementById('docs-section').style.display = 'block';
+        initDocs();
+    }
+
+    if (section === 'edt') {
+    document.getElementById('edt-section').style.display = 'block';
+    initEdt();
+   }
+
+}
+
+function showGestionSubSection(sub, event) {
+  document.querySelectorAll('#gestion-section .sub-btn').forEach(btn => btn.classList.remove('active'));
+  if (event?.target) event.target.classList.add('active');
+
+  document.getElementById('gestion-etudiants-subsection').style.display = (sub === 'etudiants') ? 'block' : 'none';
+  document.getElementById('gestion-enseignants-subsection').style.display = (sub === 'enseignants') ? 'block' : 'none';
+
+  if (sub === 'etudiants') initStudents();
+  if (sub === 'enseignants') initTeachers();
+}
+
+async function initGestion() {
+  // par défaut onglet étudiants
+  showGestionSubSection('etudiants', null);
 }
 
 function showCoursSubSection(sub, event) {
@@ -518,10 +709,6 @@ function statusUi(statut) {
 let ADMIN_RES = [];
 let ADMIN_SALLES = [];
 
-async function initSalles() {
-    await loadAdminReservations();
-}
-
 document.getElementById('resFilterStatut').addEventListener('change', () => renderAdminReservations());
 document.getElementById('resSearch').addEventListener('input', () => renderAdminReservations());
 
@@ -554,7 +741,9 @@ function renderAdminReservations() {
     if (q) {
         rows = rows.filter(r => {
             const hay = [
-                r.salle_nom, r.batiment, r.cours_nom, r.niveau, r.enseignant_nom, r.enseignant_email, r.motif, r.motif_autre
+                r.salle_nom, r.batiment, r.cours_nom, r.niveau,
+                r.enseignant_nom || '', r.enseignant_email || '',
+                r.motif, r.motif_autre
             ].map(x => String(x ?? '').toLowerCase()).join(' ');
             return hay.includes(q);
         });
@@ -583,10 +772,7 @@ function renderAdminReservations() {
                     | Cours: ${escapeHtml(r.cours_nom)} | Niveau: ${escapeHtml(r.niveau)} | Effectif: ${escapeHtml(r.effectif)}
                 </small>
                 <br>
-                <small>
-                    Enseignant: ${escapeHtml(r.enseignant_nom || '-')} (${escapeHtml(r.enseignant_email || '-')})
-                </small>
-                ${r.rejet_motif ? `<br><small style="color:#b30000;">Motif rejet: ${escapeHtml(r.rejet_motif)}</small>` : ''}
+                ${r.rejet_motif ? `<br><small style="color:#b30000;">Motif rejet : ${escapeHtml(r.rejet_motif)}</small>` : ''}
             </div>
 
             <div class="reservation-actions">
@@ -939,6 +1125,149 @@ async function deleteStudent(id) {
     await loadStudents();
 }
 
+let TEACHERS = [];
+
+async function initTeachers() {
+  await loadTeachers();
+}
+
+document.getElementById('searchTeacher')?.addEventListener('input', renderTeachers);
+
+async function loadTeachers() {
+  const tbody = document.getElementById('teachersTableBody');
+  tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:16px;color:#666;">Chargement...</td></tr>`;
+  setMsg('teachersMsg','');
+
+  const res = await fetch('admin_enseigant_gestion_list.php', { credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:16px;color:#b30000;">${escapeHtml(data.message || 'Erreur')}</td></tr>`;
+    TEACHERS = [];
+    return;
+  }
+  TEACHERS = data.data || [];
+  renderTeachers();
+
+  // refresh liste enseignants pour la création cours/affectations
+  await loadEnseignants();
+}
+
+function renderTeachers() {
+  const tbody = document.getElementById('teachersTableBody');
+  const q = (document.getElementById('searchTeacher').value || '').toLowerCase();
+
+  let rows = TEACHERS;
+  if (q) {
+    rows = rows.filter(t => {
+      const hay = [t.nom_complet, t.email].map(x => String(x ?? '').toLowerCase()).join(' ');
+      return hay.includes(q);
+    });
+  }
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:16px;color:#666;">Aucun enseignant</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = '';
+  rows.forEach(t => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(t.nom_complet)}</td>
+      <td>${escapeHtml(t.email)}</td>
+      <td>${escapeHtml(t.mdp)}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn-edit" onclick="openEditTeacher(${t.id})">Modifier</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// <button class="btn-delete" onclick="confirmDeleteTeacher(${t.id}, '${escapeHtml(t.nom_complet)}')">Supprimer</button>
+
+/* Modal enseignant */
+function openTeacherModal() {
+  setMsg('teacherMsg','');
+  document.getElementById('teacherModalTitle').textContent = 'Nouvel Enseignant';
+  document.getElementById('teacherForm').reset();
+  document.getElementById('teacher_id').value = '';
+  document.getElementById('teacherModal').style.display = 'flex';
+}
+function closeTeacherModal() {
+  document.getElementById('teacherModal').style.display = 'none';
+}
+
+document.getElementById('teacherForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  setMsg('teacherMsg','');
+
+  const id = document.getElementById('teacher_id').value;
+
+  const fd = new FormData();
+  fd.append('id', id);
+  fd.append('nom', document.getElementById('teacher_nom').value);
+  fd.append('prenom', document.getElementById('teacher_prenom').value);
+  fd.append('email', document.getElementById('teacher_email').value);
+  fd.append('mdp', document.getElementById('teacher_mdp').value);
+
+  const url = id ? 'admin_enseignant_update.php' : 'admin_enseignant_create.php';
+  const res = await fetch(url, { method:'POST', body:fd, credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    setMsg('teacherMsg', data.message || 'Erreur');
+    return;
+  }
+
+  setMsg('teachersMsg', data.message || 'OK', true);
+  closeTeacherModal();
+  await loadTeachers();
+});
+
+/* Edit */
+function openEditTeacher(id) {
+  const t = TEACHERS.find(x => Number(x.id) === Number(id));
+  if (!t) return;
+
+  openTeacherModal();
+  document.getElementById('teacherModalTitle').textContent = 'Modifier Enseignant';
+  document.getElementById('teacher_id').value = t.id;
+
+  document.getElementById('teacher_nom').value = t.nom || '';
+  document.getElementById('teacher_prenom').value = t.prenom || '';
+  document.getElementById('teacher_email').value = t.email || '';
+  document.getElementById('teacher_mdp').value = t.mdp || '';
+}
+
+/* Delete */
+function confirmDeleteTeacher(id, label) {
+  document.getElementById('confirmText').textContent = `Supprimer l'enseignant "${label}" ? (affectations supprimées en cascade)`;
+  document.getElementById('confirmOkBtn').onclick = async () => {
+    closeConfirmModal();
+    await deleteTeacher(id);
+  };
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+async function deleteTeacher(id) {
+  const fd = new FormData();
+  fd.append('id', id);
+
+  const res = await fetch('admin_enseignant_delete.php', { method:'POST', body:fd, credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    setMsg('teachersMsg', data.message || 'Erreur');
+    return;
+  }
+  setMsg('teachersMsg', data.message || 'Supprimé', true);
+  await loadTeachers();
+}
+
 async function initCours() {
     await Promise.all([loadFilieres(), loadNiveaux(), loadEnseignants()]);
     fillCourseFormReferentials();
@@ -1103,13 +1432,623 @@ document.getElementById('affectForm').addEventListener('submit', async (e) => {
     await loadCourses();
 });
 
+/* ====================== NOUVEAU : DEMANDES DOCUMENTS (JS) ====================== */
+let DOC_DEMANDES = [];
+let docToValidateId = null;
+
+function typeDocLabel(type, autre) {
+    if (type === 'homologation') return 'Homologation';
+    if (type === 'bulletin') return 'Bulletin';
+    if (type === 'certificat_scolarite') return 'Certificat de scolarité';
+    if (type === 'autre') return autre ? ('Autre : ' + autre) : 'Autre';
+    return type || '-';
+}
+
+function docStatusUi(statut) {
+    if (statut === 'traitee') return {label:'Traitée', cls:'status-confirmed'};
+    if (statut === 'refusee') return {label:'Refusée', cls:'status-cancelled'};
+    return {label:'Non traitée', cls:'status-pending'};
+}
+
+function initDocs() {
+    loadDocDemandes();
+}
+
+document.getElementById('docFilterStatut').addEventListener('change', renderDocDemandes);
+document.getElementById('docSearch').addEventListener('input', renderDocDemandes);
+
+async function loadDocDemandes() {
+    const list = document.getElementById('doc-demandes-list');
+    list.innerHTML = `<p style="padding:10px;color:#666;">Chargement...</p>`;
+    setMsg('docDemandesMsg','');
+
+    const res = await fetch('admin_document_demandes_list.php', { credentials:'same-origin' });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+        list.innerHTML = `<p style="padding:10px;color:#b30000;">${escapeHtml(data.message || 'Erreur')}</p>`;
+        DOC_DEMANDES = [];
+        return;
+    }
+    DOC_DEMANDES = data.data || [];
+    renderDocDemandes();
+}
+
+function renderDocDemandes() {
+    const list = document.getElementById('doc-demandes-list');
+    const statut = document.getElementById('docFilterStatut').value;
+    const q = (document.getElementById('docSearch').value || '').toLowerCase();
+
+    let rows = DOC_DEMANDES;
+
+    if (statut) rows = rows.filter(d => d.statut === statut);
+
+    if (q) {
+        rows = rows.filter(d => {
+            const hay = [
+                d.id, d.etudiant_id, d.etudiant_nom, d.etudiant_email,
+                d.type_document, d.autre_document, d.commentaire, d.motif_refus, d.statut
+            ].map(x => String(x ?? '').toLowerCase()).join(' ');
+            return hay.includes(q);
+        });
+    }
+
+    if (!rows.length) {
+        list.innerHTML = `<p style="text-align:center; padding: 20px; color: #666;">Aucune demande</p>`;
+        return;
+    }
+
+    list.innerHTML = '';
+    rows.forEach(d => {
+        const st = docStatusUi(d.statut);
+        const docLabel = typeDocLabel(d.type_document, d.autre_document);
+
+        const item = document.createElement('div');
+        item.className = 'reservation-item';
+        item.innerHTML = `
+            <div class="reservation-info">
+                <strong>Demande #${escapeHtml(d.id)} — ${escapeHtml(docLabel)}</strong>
+                <span class="status-badge ${st.cls}" style="margin-left:10px;">${st.label}</span>
+                <br>
+                <small>
+                    Étudiant : ${escapeHtml(d.etudiant_nom || 'Inconnu')} ${d.etudiant_email ? `(${escapeHtml(d.etudiant_email)})` : ''}
+                </small>
+                <br>
+                <small>
+                    Demandée le : ${fmtDateTime(d.date_demande)}
+                    ${d.date_traitement ? `| Traitée le : ${fmtDateTime(d.date_traitement)}` : ''}
+                </small>
+                ${d.commentaire ? `<br><small>Commentaire : ${escapeHtml(d.commentaire)}</small>` : ''}
+                ${d.motif_refus ? `<br><small style="color:#b30000;">Motif refus : ${escapeHtml(d.motif_refus)}</small>` : ''}
+            </div>
+
+            <div class="reservation-actions">
+                ${d.statut === 'non_traite' ? `
+                    <button class="btn-edit" onclick="openDocValidateModal(${d.id})">Valider</button>
+                    <button class="btn-delete" onclick="openDocRejectModal(${d.id})">Refuser</button>
+                ` : ''}
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function openDocValidateModal(id) {
+    docToValidateId = id;
+    document.getElementById('docValidateModal').style.display = 'flex';
+}
+
+function closeDocValidateModal() {
+    docToValidateId = null;
+    document.getElementById('docValidateModal').style.display = 'none';
+}
+
+document.getElementById('btnDocConfirmValidate').addEventListener('click', async () => {
+    if (!docToValidateId) return;
+
+    const id = docToValidateId;
+    closeDocValidateModal();
+
+    const fd = new FormData();
+    fd.append('id', id);
+
+    const res = await fetch('admin_document_demande_validate.php', { method:'POST', body:fd, credentials:'same-origin' });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+        setMsg('docDemandesMsg', data.message || 'Erreur lors de la validation');
+        return;
+    }
+
+    setMsg('docDemandesMsg', data.message || 'Demande validée.', true);
+    await loadDocDemandes();
+});
+
+function openDocRejectModal(id) {
+    setMsg('docRejectMsg','');
+    document.getElementById('doc_reject_id').value = id;
+    document.getElementById('doc_reject_motif').value = '';
+    document.getElementById('docRejectModal').style.display = 'flex';
+}
+
+function closeDocRejectModal() {
+    document.getElementById('docRejectModal').style.display = 'none';
+}
+
+document.getElementById('docRejectForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setMsg('docRejectMsg','');
+
+    const id = document.getElementById('doc_reject_id').value;
+    const motif = document.getElementById('doc_reject_motif').value;
+
+    const fd = new FormData();
+    fd.append('id', id);
+    fd.append('motif_refus', motif);
+
+    const res = await fetch('admin_document_demande_reject.php', { method:'POST', body:fd, credentials:'same-origin' });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+        setMsg('docRejectMsg', data.message || 'Erreur');
+        return;
+    }
+
+    closeDocRejectModal();
+    setMsg('docDemandesMsg', data.message || 'Demande refusée.', true);
+    await loadDocDemandes();
+});
+
+/* ====================== NOUVEAU : EMPLOI DU TEMPS (JS) ====================== */
+
+let EDT_REF = { filieres: [], niveaux: [], salles: [] };
+let EDT_AFFECTATIONS = []; // listées selon filière/niveau/année/groupe
+let EDT_LOADED_WEEKS = []; // semaines chargées du mois
+
+function iso(d) {
+  // Date -> YYYY-MM-DD
+  const pad = (n) => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function frDateLabel(isoDate) {
+  const d = new Date(isoDate + 'T00:00:00');
+  return d.toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+function setSelectOptions(sel, items, getVal, getLab, placeholder='Sélectionnez') {
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  items.forEach(it => sel.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(getVal(it))}">${escapeHtml(getLab(it))}</option>`));
+}
+
+async function initEdt() {
+  setMsg('edtMsg','');
+  // Charger référentiels
+  const res = await fetch('admin_edt_referentials.php', { credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    setMsg('edtMsg', data.message || 'Erreur chargement référentiels');
+    return;
+  }
+
+  EDT_REF = data.data || { filieres:[], niveaux:[], salles:[] };
+
+  setSelectOptions(
+    document.getElementById('edt_filiere'),
+    EDT_REF.filieres || [],
+    x => x.id,
+    x => x.nom,
+    'Choisir filière'
+  );
+
+  setSelectOptions(
+    document.getElementById('edt_niveau'),
+    EDT_REF.niveaux || [],
+    x => x.id,
+    x => x.libelle,
+    'Choisir niveau'
+  );
+
+  // Valeur par défaut mois = mois courant
+  const now = new Date();
+  document.getElementById('edt_mois').value = String(now.getMonth()+1);
+
+  // auto charger quand filière/niveau changent
+  document.getElementById('edt_filiere').onchange = () => { clearEdtUI(); };
+  document.getElementById('edt_niveau').onchange = () => { clearEdtUI(); };
+}
+
+function clearEdtUI() {
+  EDT_LOADED_WEEKS = [];
+  document.getElementById('edtWeeksWrap').innerHTML = '';
+}
+
+function edtParams() {
+  return {
+    filiere_id: document.getElementById('edt_filiere').value,
+    niveau_id: document.getElementById('edt_niveau').value,
+    annee_scolaire: document.getElementById('edt_annee').value.trim(),
+    groupe: document.getElementById('edt_groupe').value.trim(),
+    mois: document.getElementById('edt_mois').value
+  };
+}
+
+async function loadEdtAffectations() {
+  const p = edtParams();
+  if (!p.filiere_id || !p.niveau_id || !p.annee_scolaire) return [];
+
+    const qs = new URLSearchParams({
+    filiere_id: p.filiere_id,
+    niveau_id: p.niveau_id,
+    annee_scolaire: p.annee_scolaire
+    });
+
+  const res = await fetch('admin_edt_affectations_list.php?' + qs.toString(), { credentials:'same-origin' });
+  const data = await res.json();
+
+  if (res.ok && data.success) return (data.data || []);
+  return [];
+}
+
+async function loadEdtMonth() {
+  setMsg('edtMsg','');
+  const p = edtParams();
+
+  if (!p.filiere_id || !p.niveau_id || !p.annee_scolaire || !p.mois) {
+    setMsg('edtMsg', 'Veuillez choisir Filière + Niveau + Année scolaire + Mois');
+    return;
+  }
+
+  // Charger affectations (cours+enseignant) pour remplir les selects
+  EDT_AFFECTATIONS = await loadEdtAffectations();
+
+  // Charger mois depuis la base
+  const qs = new URLSearchParams({
+    filiere_id: p.filiere_id,
+    niveau_id: p.niveau_id,
+    annee_scolaire: p.annee_scolaire,
+    mois: p.mois
+  });
+
+  const res = await fetch('admin_edt_month_get.php?' + qs.toString(), { credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    clearEdtUI();
+    setMsg('edtMsg', data.message || 'Erreur chargement mois');
+    return;
+  }
+
+  EDT_LOADED_WEEKS = data.data?.weeks || [];
+  renderWeeks();
+  setMsg('edtMsg', 'Mois chargé.', true);
+}
+
+function renderWeeks() {
+  const wrap = document.getElementById('edtWeeksWrap');
+  wrap.innerHTML = '';
+
+  if (!EDT_LOADED_WEEKS.length) {
+    wrap.innerHTML = `<p style="padding:12px;color:#666;">Aucune semaine enregistrée pour ce mois. Clique sur “+ Ajouter semaine”.</p>`;
+    return;
+  }
+
+  EDT_LOADED_WEEKS.forEach((w, idx) => {
+    wrap.appendChild(buildWeekCard(w, idx));
+  });
+}
+
+function buildWeekCard(week, idx) {
+  const card = document.createElement('div');
+  card.className = 'reservation-item';
+  card.style.marginBottom = '12px';
+
+  const weekId = week.week_id || week.id || '';
+
+  card.innerHTML = `
+    <div class="reservation-info" style="width:100%;">
+      <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+        <div>
+          <strong>Semaine ${idx+1}</strong>
+          <span style="margin-left:10px;color:#555;">${escapeHtml(week.label || '')}</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-edit" type="button" onclick="saveWeek('${weekId}', ${idx})">Enregistrer</button>
+          ${weekId ? `<button class="btn-delete" type="button" onclick="deleteWeek('${weekId}')">Supprimer semaine</button>` : ''}
+        </div>
+      </div>
+
+      <div class="search-filter-bar" style="margin-top:10px;">
+        <div class="form-group" style="min-width:220px;">
+          <label>Label semaine</label>
+          <input class="search-input" id="edt_week_label_${idx}" value="${escapeHtml(week.label || '')}" placeholder="Ex: Du 02 au 06 Février 2026">
+        </div>
+
+        <div class="form-group" style="min-width:180px;">
+          <label>Date début (lundi)</label>
+          <input type="date" class="search-input" id="edt_week_start_${idx}" value="${escapeHtml(week.date_debut || '')}">
+        </div>
+
+        <div class="form-group" style="min-width:180px;">
+          <label>Date fin (vendredi)</label>
+          <input type="date" class="search-input" id="edt_week_end_${idx}" value="${escapeHtml(week.date_fin || '')}">
+        </div>
+
+        <button class="btn-add-reservation" type="button" onclick="genWeekDays(${idx})">Générer jours</button>
+      </div>
+
+      <div id="edt_week_days_${idx}" style="margin-top:10px;"></div>
+    </div>
+  `;
+
+  // Render days if already present
+  renderDays(idx, week.days || []);
+  return card;
+}
+
+function addWeek() {
+  const p = edtParams();
+  if (!p.filiere_id || !p.niveau_id || !p.annee_scolaire || !p.mois) {
+    setMsg('edtMsg', 'Choisis Filière + Niveau + Année scolaire + Mois, puis clique sur Charger.', false);
+    return;
+  }
+
+  EDT_LOADED_WEEKS.push({
+    week_id: null,
+    label: '',
+    date_debut: '',
+    date_fin: '',
+    days: []
+  });
+
+  renderWeeks();
+}
+
+function genWeekDays(idx) {
+  const start = document.getElementById(`edt_week_start_${idx}`).value;
+  const end = document.getElementById(`edt_week_end_${idx}`).value;
+
+  if (!start || !end) {
+    setMsg('edtMsg', 'Renseigne date début et date fin.', false);
+    return;
+  }
+
+  const d0 = new Date(start + 'T00:00:00');
+  const d1 = new Date(end + 'T00:00:00');
+  if (d1 < d0) {
+    setMsg('edtMsg', 'Date fin doit être >= date début.', false);
+    return;
+  }
+
+  // On génère 5 jours max (lundi->vendredi) selon interval donné (tu peux ajuster)
+  const days = [];
+  let cur = new Date(d0);
+  while (cur <= d1 && days.length < 5) {
+    const dayIso = iso(cur);
+    days.push({
+      jour_date: dayIso,
+      sessions: buildDefaultSessions(dayIso)
+    });
+    cur.setDate(cur.getDate()+1);
+  }
+
+  EDT_LOADED_WEEKS[idx].date_debut = start;
+  EDT_LOADED_WEEKS[idx].date_fin = end;
+  EDT_LOADED_WEEKS[idx].days = days;
+
+  renderDays(idx, days);
+}
+
+function buildDefaultSessions(dayIso) {
+  // 4 slots: Matin M1/M2, Après-midi A1/A2
+  return [
+    { slot:'M1', affectation_id:'', salle_id:'', notes:'' },
+    { slot:'M2', affectation_id:'', salle_id:'', notes:'' },
+    { slot:'A1', affectation_id:'', salle_id:'', notes:'' },
+    { slot:'A2', affectation_id:'', salle_id:'', notes:'' },
+  ].map(s => ({ ...s, jour_date: dayIso }));
+}
+
+function renderDays(idx, days) {
+  const wrap = document.getElementById(`edt_week_days_${idx}`);
+  if (!wrap) return;
+
+  if (!days.length) {
+    wrap.innerHTML = `<p style="padding:10px;color:#666;">Clique sur “Générer jours”.</p>`;
+    return;
+  }
+
+  wrap.innerHTML = '';
+  days.forEach((d, dayIdx) => {
+    const block = document.createElement('div');
+    block.style.border = '1px solid #eee';
+    block.style.borderRadius = '10px';
+    block.style.padding = '10px';
+    block.style.marginBottom = '10px';
+    block.style.background = '#fff';
+
+    block.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <strong>${escapeHtml(frDateLabel(d.jour_date))}</strong>
+        <span style="color:#666;">${escapeHtml(d.jour_date)}</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+        <div>
+          <div style="font-weight:600;margin-bottom:6px;">Matin (09:00–12:30)</div>
+          ${renderSlotSelectHtml(idx, dayIdx, 'M1', '09:00–10:45')}
+          ${renderSlotSelectHtml(idx, dayIdx, 'M2', '11:00–12:30')}
+        </div>
+        <div>
+          <div style="font-weight:600;margin-bottom:6px;">Après-midi (13:30–17:00)</div>
+          ${renderSlotSelectHtml(idx, dayIdx, 'A1', '13:30–15:15')}
+          ${renderSlotSelectHtml(idx, dayIdx, 'A2', '15:30–17:00')}
+        </div>
+      </div>
+    `;
+
+    wrap.appendChild(block);
+
+    // Remplir selects avec valeurs existantes si présentes
+    fillSlotSelects(idx, dayIdx, d.sessions || buildDefaultSessions(d.jour_date));
+  });
+}
+
+function renderSlotSelectHtml(weekIdx, dayIdx, slot, hoursLabel) {
+  const idAff = `edt_${weekIdx}_${dayIdx}_${slot}_aff`;
+  const idSalle = `edt_${weekIdx}_${dayIdx}_${slot}_salle`;
+  return `
+    <div style="display:grid; grid-template-columns:1fr 180px; gap:8px; align-items:end; margin-bottom:8px;">
+      <div class="form-group" style="margin:0;">
+        <label>${escapeHtml(hoursLabel)} — Cours/Enseignant</label>
+        <select class="filter-select" id="${idAff}"></select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Salle</label>
+        <select class="filter-select" id="${idSalle}"></select>
+      </div>
+    </div>
+  `;
+}
+
+function fillSlotSelects(weekIdx, dayIdx, sessions) {
+  // options affectations
+  const affOptions = EDT_AFFECTATIONS.map(a => ({
+    val: a.affectation_id || a.id,
+    lab: `${a.cours_nom || a.nom_cours || 'Cours'} — ${a.enseignant_nom || a.nom_enseignant || 'Enseignant'}`
+  }));
+
+  // options salles
+  const salles = (EDT_REF.salles || []).map(s => ({
+    val: s.id,
+    lab: `${s.batiment}${s.nom ? ' - ' + s.nom : ''} (${s.type})`
+  }));
+
+  const bySlot = {};
+  (sessions || []).forEach(s => { bySlot[s.slot] = s; });
+
+  ['M1','M2','A1','A2'].forEach(slot => {
+    const selAff = document.getElementById(`edt_${weekIdx}_${dayIdx}_${slot}_aff`);
+    const selSalle = document.getElementById(`edt_${weekIdx}_${dayIdx}_${slot}_salle`);
+    if (!selAff || !selSalle) return;
+
+    selAff.innerHTML = `<option value="">(vide)</option>` + affOptions.map(o => `<option value="${escapeHtml(o.val)}">${escapeHtml(o.lab)}</option>`).join('');
+    selSalle.innerHTML = `<option value="">(vide)</option>` + salles.map(o => `<option value="${escapeHtml(o.val)}">${escapeHtml(o.lab)}</option>`).join('');
+
+    const s = bySlot[slot] || {};
+    if (s.affectation_id) selAff.value = String(s.affectation_id);
+    if (s.salle_id) selSalle.value = String(s.salle_id);
+  });
+}
+
+function collectWeekPayload(weekIdx, existingWeekId=null) {
+  const p = edtParams();
+
+  const label = document.getElementById(`edt_week_label_${weekIdx}`).value.trim();
+  const date_debut = document.getElementById(`edt_week_start_${weekIdx}`).value;
+  const date_fin = document.getElementById(`edt_week_end_${weekIdx}`).value;
+
+  const week = EDT_LOADED_WEEKS[weekIdx];
+  const days = week.days || [];
+
+  // sessions -> tableau plat attendu par admin_edt_save.php
+  const sessions = [];
+  days.forEach((d, dayIdx) => {
+    ['M1','M2','A1','A2'].forEach(slot => {
+      const selAff = document.getElementById(`edt_${weekIdx}_${dayIdx}_${slot}_aff`);
+      const selSalle = document.getElementById(`edt_${weekIdx}_${dayIdx}_${slot}_salle`);
+      if (!selAff || !selSalle) return;
+
+      const affectation_id = selAff.value ? Number(selAff.value) : null;
+      const salle_id = selSalle.value ? Number(selSalle.value) : null;
+
+      // on ne push que si au moins un champ est rempli
+      if (affectation_id || salle_id) {
+        sessions.push({
+          jour_date: d.jour_date,
+          slot,
+          affectation_id,
+          salle_id,
+          notes: ''
+        });
+      }
+    });
+  });
+
+  return {
+    week_id: existingWeekId || null,
+    filiere_id: Number(p.filiere_id),
+    niveau_id: Number(p.niveau_id),
+    annee_scolaire: p.annee_scolaire,
+    groupe: p.groupe || null,
+    mois: Number(p.mois),
+    date_debut,
+    date_fin,
+    label,
+    sessions
+  };
+}
+
+async function saveWeek(existingWeekId, weekIdx) {
+  setMsg('edtMsg','');
+
+  const payload = collectWeekPayload(weekIdx, existingWeekId || null);
+
+  if (!payload.date_debut || !payload.date_fin || !payload.label) {
+    setMsg('edtMsg', 'Label + date début + date fin sont obligatoires.', false);
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('payload', JSON.stringify(payload));
+
+  const res = await fetch('admin_edt_save.php', { method:'POST', body:fd, credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    setMsg('edtMsg', data.message || 'Erreur sauvegarde EDT', false);
+    return;
+  }
+
+  setMsg('edtMsg', data.message || 'Semaine enregistrée.', true);
+  await loadEdtMonth(); // refresh depuis base
+}
+
+async function deleteWeek(weekId) {
+  if (!confirm('Supprimer cette semaine et toutes ses séances ?')) return;
+
+  const fd = new FormData();
+  fd.append('week_id', weekId);
+
+  const res = await fetch('admin_edt_week_delete.php', { method:'POST', body:fd, credentials:'same-origin' });
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    setMsg('edtMsg', data.message || 'Erreur suppression semaine', false);
+    return;
+  }
+
+  setMsg('edtMsg', data.message || 'Semaine supprimée.', true);
+  await loadEdtMonth();
+}
+
+/* ====================== FIN NOUVEAU : EMPLOI DU TEMPS (JS) ====================== */
+
+
+/* ====================== FIN NOUVEAU ====================== */
+
 window.addEventListener('click', (e) => {
     const modals = {
         studentModal: closeStudentModal,
+        teacherModal: closeTeacherModal,
         confirmModal: closeConfirmModal,
         affectModal: closeAffectModal,
         rejectModal: closeRejectModal,
-        validateReservationModal: closeValidateReservationModal
+        validateReservationModal: closeValidateReservationModal,
+        // NOUVEAU
+        docRejectModal: closeDocRejectModal,
+        docValidateModal: closeDocValidateModal
     };
 
     for (const [id, closeFn] of Object.entries(modals)) {
@@ -1117,6 +2056,7 @@ window.addEventListener('click', (e) => {
     }
 });
 
+// ⚠️ ton code avait ce doublon, je le garde EXACTEMENT (logique existante)
 async function initSalles() {
     await loadAdminReservations();
 }

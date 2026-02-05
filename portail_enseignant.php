@@ -56,21 +56,7 @@ $anneeScolaire = $_SESSION['annee_scolaire'] ?? '2025-2026';
 
     <!-- EMPLOI DU TEMPS -->
     <section class="emploi-container" id="emploi-temps-section">
-        <table class="emploi-table">
-            <tr>
-                <th>Horaires</th><th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th>
-            </tr>
-            <tr><td>09:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>11:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>14:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>17:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>18:00</td><td></td><td></td><td></td><td></td><td></td></tr>
-        </table>
+        <?php include __DIR__ . '/sections/planning_enseignant.php'; ?>
     </section>
 </div>
 
@@ -825,32 +811,77 @@ function getCurrentCourseNameForReservation() {
     return '';
 }
 
-function openReservationModal() {
-    document.getElementById('reservationMsg').textContent = '';
-    document.getElementById('reservationMsg').style.color = '#b30000';
+async function ensureAffectationsLoaded() {
+  if (AFFECTATIONS.length) return true;
 
-    clearDateErrors();
+  try {
+    const res = await fetch(
+      'enseignant_cours_list.php?annee_scolaire=' + encodeURIComponent(ANNEE_SCOLAIRE),
+      { credentials: 'same-origin' }
+    );
 
-    document.getElementById('reservationForm').reset();
-    document.getElementById('motifAutreWrap').style.display = 'none';
-    document.getElementById('salle_id').innerHTML = `<option value="">Sélectionnez d'abord bâtiment + type</option>`;
-    document.getElementById('salleInfo').textContent = '';
+    const raw = await res.text();
+    let data = null;
+    try { data = JSON.parse(raw); } catch(e) { data = null; }
 
-    const courseName = getCurrentCourseNameForReservation();
-    document.getElementById('cours_nom').value = courseName;
-    if (!courseName) {
-        document.getElementById('coursHelp').style.color = '#b30000';
-        document.getElementById('coursHelp').textContent = "Aucun cours affecté trouvé. Demandez à l'admin de vous affecter à un cours.";
-    } else {
-        document.getElementById('coursHelp').style.color = '#666';
-        document.getElementById('coursHelp').textContent = "Le cours est automatiquement défini selon votre affectation.";
+    if (!res.ok || !data || !data.success) {
+      console.error('enseignant_cours_list.php error:', raw);
+      return false;
     }
 
-    document.getElementById('niveau').value = '';
+    AFFECTATIONS = data.data || [];
 
-    document.getElementById('reservationModal').style.display = 'flex';
-    ensureSallesLoaded();
+    // Si rien sélectionné, on prend la 1ère affectation (utile pour réservation)
+    if (!CURRENT_AFFECTATION_ID && AFFECTATIONS.length) {
+      CURRENT_AFFECTATION_ID = String(AFFECTATIONS[0].affectation_id);
+      CURRENT_COURS_ID = AFFECTATIONS[0].cours_id ? String(AFFECTATIONS[0].cours_id) : null;
+    }
+
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }
+
+
+async function openReservationModal() {
+  document.getElementById('reservationMsg').textContent = '';
+  document.getElementById('reservationMsg').style.color = '#b30000';
+
+  clearDateErrors();
+
+  document.getElementById('reservationForm').reset();
+  document.getElementById('motifAutreWrap').style.display = 'none';
+  document.getElementById('salle_id').innerHTML = `<option value="">Sélectionnez d'abord bâtiment + type</option>`;
+  document.getElementById('salleInfo').textContent = '';
+
+  // ✅ IMPORTANT: charger les affectations même si on n'a jamais ouvert "Etudiants"
+  const ok = await ensureAffectationsLoaded();
+
+  const courseName = ok ? getCurrentCourseNameForReservation() : '';
+  document.getElementById('cours_nom').value = courseName;
+
+  if (!courseName) {
+    document.getElementById('coursHelp').style.color = '#b30000';
+    document.getElementById('coursHelp').textContent =
+      ok
+        ? "Aucune affectation trouvée. Demandez à l'admin de vous affecter à un cours."
+        : "Impossible de charger vos affectations (vérifiez l'API enseignant_cours_list.php).";
+  } else {
+    document.getElementById('coursHelp').style.color = '#666';
+    document.getElementById('coursHelp').textContent =
+      "Le cours est automatiquement défini selon votre affectation.";
+  }
+
+  document.getElementById('niveau').value = '';
+
+  document.getElementById('reservationModal').style.display = 'flex';
+
+  // salles
+  await ensureSallesLoaded();
+}
+
 
 function closeReservationModal() {
     document.getElementById('reservationModal').style.display = 'none';

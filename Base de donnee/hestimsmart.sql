@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : ven. 30 jan. 2026 à 00:25
+-- Généré le : jeu. 05 fév. 2026 à 20:51
 -- Version du serveur : 5.7.24
 -- Version de PHP : 8.3.1
 
@@ -41,7 +41,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`id`, `NOM`, `PRENOM`, `EMAIL`, `MDP`, `created_at`) VALUES
-(1, 'ADMIN', 'HESTIM', 'admin@hestim.ma', '123456', '2026-01-29 23:46:04');
+(1, 'ADMIN', 'HESTIM', 'manuellamht@gmail.com', '123456', '2026-01-29 23:46:04');
 
 -- --------------------------------------------------------
 
@@ -61,10 +61,8 @@ CREATE TABLE `cours` (
 --
 
 INSERT INTO `cours` (`id`, `code`, `nom`, `description`) VALUES
-(1, 'ALGO1', 'Algorithmes et structures de données', NULL),
-(2, 'BD1', 'Base de données', NULL),
-(3, 'RESEAUX1', 'Réseaux informatiques', NULL),
-(4, 'PG', 'Programmation', NULL);
+(5, 'bdd', 'Programmation des bases de données', NULL),
+(6, 'ri', 'Réseaux', NULL);
 
 -- --------------------------------------------------------
 
@@ -78,7 +76,8 @@ CREATE TABLE `document_demandes` (
   `type_document` enum('homologation','bulletin','certificat_scolarite','autre') NOT NULL,
   `autre_document` varchar(255) DEFAULT NULL,
   `commentaire` varchar(500) DEFAULT NULL,
-  `statut` enum('non_traite','traite') NOT NULL DEFAULT 'non_traite',
+  `motif_refus` varchar(255) DEFAULT NULL,
+  `statut` enum('non_traite','traitee','refusee') NOT NULL DEFAULT 'non_traite',
   `date_demande` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `date_traitement` datetime DEFAULT NULL,
   `demandeur_nom` varchar(255) NOT NULL,
@@ -86,12 +85,77 @@ CREATE TABLE `document_demandes` (
   `demandeur_email` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
 --
--- Déchargement des données de la table `document_demandes`
+-- Structure de la table `edt_sessions`
 --
 
-INSERT INTO `document_demandes` (`id`, `etudiant_id`, `type_document`, `autre_document`, `commentaire`, `statut`, `date_demande`, `date_traitement`, `demandeur_nom`, `demandeur_prenom`, `demandeur_email`) VALUES
-(8, 1, 'homologation', NULL, 'C\'est urgent !!!', 'non_traite', '2026-01-29 21:16:34', NULL, 'LALEYE', 'Adetutu', 'ademht@hestim.ma');
+CREATE TABLE `edt_sessions` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `week_id` int(10) UNSIGNED NOT NULL,
+  `jour_date` date NOT NULL,
+  `slot` enum('M1','M2','A1','A2') NOT NULL,
+  `affectation_id` int(10) UNSIGNED NOT NULL,
+  `salle_id` int(10) UNSIGNED NOT NULL,
+  `notes` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table `edt_sessions`
+--
+
+INSERT INTO `edt_sessions` (`id`, `week_id`, `jour_date`, `slot`, `affectation_id`, `salle_id`, `notes`, `created_at`, `updated_at`) VALUES
+(9, 3, '2026-02-02', 'M1', 3, 1, NULL, '2026-02-05 19:55:01', '2026-02-05 21:28:24'),
+(10, 3, '2026-02-02', 'M2', 3, 1, NULL, '2026-02-05 19:55:01', '2026-02-05 21:28:24'),
+(11, 3, '2026-02-02', 'A1', 4, 5, NULL, '2026-02-05 19:55:01', '2026-02-05 21:28:24'),
+(12, 3, '2026-02-02', 'A2', 4, 5, NULL, '2026-02-05 19:55:01', '2026-02-05 21:28:24'),
+(13, 4, '2026-02-09', 'M1', 3, 1, NULL, '2026-02-05 19:57:28', '2026-02-05 21:29:23'),
+(14, 4, '2026-02-09', 'M2', 3, 1, NULL, '2026-02-05 19:57:28', '2026-02-05 21:29:23'),
+(25, 3, '2026-02-04', 'M1', 3, 1, NULL, '2026-02-05 21:28:24', '2026-02-05 21:28:24'),
+(26, 3, '2026-02-04', 'M2', 3, 1, NULL, '2026-02-05 21:28:24', '2026-02-05 21:28:24'),
+(27, 3, '2026-02-05', 'M1', 4, 9, NULL, '2026-02-05 21:28:24', '2026-02-05 21:28:24'),
+(28, 3, '2026-02-05', 'M2', 4, 9, NULL, '2026-02-05 21:28:24', '2026-02-05 21:28:24'),
+(29, 3, '2026-02-05', 'A1', 3, 1, NULL, '2026-02-05 21:28:24', '2026-02-05 21:28:24'),
+(32, 4, '2026-02-10', 'M1', 4, 1, NULL, '2026-02-05 21:29:23', '2026-02-05 21:29:23'),
+(33, 4, '2026-02-10', 'M2', 4, 1, NULL, '2026-02-05 21:29:23', '2026-02-05 21:29:23'),
+(34, 4, '2026-02-10', 'A1', 3, 3, NULL, '2026-02-05 21:29:23', '2026-02-05 21:29:23'),
+(35, 4, '2026-02-10', 'A2', 3, 3, NULL, '2026-02-05 21:29:23', '2026-02-05 21:29:23'),
+(36, 5, '2026-02-16', 'M1', 4, 5, NULL, '2026-02-05 21:40:48', '2026-02-05 21:40:48'),
+(37, 5, '2026-02-16', 'M2', 4, 5, NULL, '2026-02-05 21:40:48', '2026-02-05 21:40:48'),
+(38, 5, '2026-02-16', 'A1', 3, 9, NULL, '2026-02-05 21:40:48', '2026-02-05 21:40:48'),
+(39, 5, '2026-02-16', 'A2', 3, 9, NULL, '2026-02-05 21:40:48', '2026-02-05 21:40:48');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `edt_weeks`
+--
+
+CREATE TABLE `edt_weeks` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `filiere_id` int(10) UNSIGNED NOT NULL,
+  `niveau_id` tinyint(3) UNSIGNED NOT NULL,
+  `annee_scolaire` varchar(9) NOT NULL,
+  `groupe` varchar(20) DEFAULT NULL,
+  `mois` tinyint(3) UNSIGNED NOT NULL,
+  `date_debut` date NOT NULL,
+  `date_fin` date NOT NULL,
+  `label` varchar(120) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table `edt_weeks`
+--
+
+INSERT INTO `edt_weeks` (`id`, `filiere_id`, `niveau_id`, `annee_scolaire`, `groupe`, `mois`, `date_debut`, `date_fin`, `label`, `created_at`, `updated_at`) VALUES
+(3, 1, 3, '2025-2026', NULL, 2, '2026-02-02', '2026-02-06', 'Semaine du 02 au 06 Février 2026', '2026-02-05 19:55:01', '2026-02-05 20:16:10'),
+(4, 1, 3, '2025-2026', NULL, 2, '2026-02-09', '2026-02-13', 'Semaine du 9 au 13 Février 2026', '2026-02-05 19:57:28', '2026-02-05 19:57:28'),
+(5, 1, 3, '2025-2026', NULL, 2, '2026-02-16', '2026-02-20', 'Semaine du 16 au 20 Février 2026', '2026-02-05 21:40:48', '2026-02-05 21:40:48');
 
 -- --------------------------------------------------------
 
@@ -112,19 +176,8 @@ CREATE TABLE `enseignant` (
 --
 
 INSERT INTO `enseignant` (`ID-ENSEIGNANT`, `NOM`, `PRENOM`, `EMAIL`, `MDP`) VALUES
-(1, 'MEHINTO', 'Manuella', 'manuellamht@hestim.ma', '123456'),
-(2, 'ISSIFOU', 'Abdel', 'abdel@hestim.ma', '7890');
-
---
--- Déclencheurs `enseignant`
---
-DELIMITER $$
-CREATE TRIGGER `after_insert_enseignant` AFTER INSERT ON `enseignant` FOR EACH ROW BEGIN
-    INSERT INTO liste_enseignant (email, mdp)
-    VALUES (NEW.email, NEW.mdp);
-END
-$$
-DELIMITER ;
+(13, 'Ondaye', 'Jane', 'jane@gmail.com', '1234'),
+(14, 'Azzedinde', 'Khiat', 'khiat@gmail.com', '1234');
 
 -- --------------------------------------------------------
 
@@ -147,8 +200,8 @@ CREATE TABLE `enseignant_affectations` (
 --
 
 INSERT INTO `enseignant_affectations` (`id`, `enseignant_id`, `filiere_id`, `niveau_id`, `cours_id`, `annee_scolaire`, `groupe`) VALUES
-(1, 1, 1, 1, 1, '2025-2026', 'G1'),
-(2, 2, 4, 4, 4, '2025-2026', NULL);
+(4, 13, 1, 3, 6, '2025-2026', NULL),
+(3, 14, 1, 3, 5, '2025-2026', NULL);
 
 -- --------------------------------------------------------
 
@@ -164,13 +217,6 @@ CREATE TABLE `etudiant` (
   `MDP` varchar(255) NOT NULL,
   `date_inscription` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `etudiant`
---
-
-INSERT INTO `etudiant` (`ID-ETUDIANT`, `NOM`, `PRENOM`, `EMAIL`, `MDP`, `date_inscription`) VALUES
-(1, 'LALEYE MODIF', 'Adetutu', 'ademht@hestim.ma', '123455', '2026-01-29 23:23:18');
 
 -- --------------------------------------------------------
 
@@ -214,10 +260,8 @@ CREATE TABLE `filiere_cours` (
 --
 
 INSERT INTO `filiere_cours` (`id`, `filiere_id`, `cours_id`, `niveau_id`, `semestre`) VALUES
-(1, 1, 1, 1, 1),
-(2, 1, 2, 1, 1),
-(3, 1, 3, 1, 1),
-(4, 4, 4, 4, 2);
+(5, 1, 5, 3, NULL),
+(6, 1, 6, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -234,13 +278,6 @@ CREATE TABLE `inscriptions` (
   `groupe` varchar(20) DEFAULT NULL,
   `date_inscription` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Déchargement des données de la table `inscriptions`
---
-
-INSERT INTO `inscriptions` (`id`, `etudiant_id`, `filiere_id`, `niveau_id`, `annee_scolaire`, `groupe`, `date_inscription`) VALUES
-(1, 1, 1, 1, '2025-2026', 'G1', '2026-01-29 22:42:04');
 
 -- --------------------------------------------------------
 
@@ -283,13 +320,6 @@ CREATE TABLE `presences` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `presences`
---
-
-INSERT INTO `presences` (`id`, `enseignant_id`, `affectation_id`, `cours_id`, `etudiant_id`, `annee_scolaire`, `presence_at`, `present`, `commentaire`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, 1, '2025-2026', '2026-01-30 01:16:00', 1, NULL, '2026-01-30 01:16:06', '2026-01-30 01:16:06');
-
 -- --------------------------------------------------------
 
 --
@@ -318,10 +348,7 @@ CREATE TABLE `reservations_salles` (
 --
 
 INSERT INTO `reservations_salles` (`id`, `enseignant_id`, `salle_id`, `cours_nom`, `niveau`, `effectif`, `motif`, `motif_autre`, `date_debut`, `date_fin`, `statut`, `rejet_motif`, `created_at`, `updated_at`) VALUES
-(1, 1, 5, 'info', '1ere anne', 30, 'cours', NULL, '2026-02-06 13:17:00', '2026-02-06 17:00:00', 'annulee', NULL, '2026-01-29 22:00:55', '2026-01-29 22:01:50'),
-(2, 1, 12, 'Algo', '1ère année', 24, 'autre', 'Rattrapage', '2026-01-28 00:05:00', '2026-01-28 00:22:00', 'validee', NULL, '2026-01-30 00:05:51', '2026-01-30 00:06:19'),
-(3, 1, 5, 'FB', '1ère année', 23, 'td', NULL, '2026-01-01 00:08:00', '2026-01-01 00:20:00', 'rejetee', 'Occupé', '2026-01-30 00:07:34', '2026-01-30 00:07:52'),
-(4, 1, 1, 'info', '1ère année', 12, 'td', NULL, '2026-01-08 03:18:00', '2026-01-30 03:18:00', 'validee', NULL, '2026-01-30 00:18:33', '2026-01-30 00:18:51');
+(5, 13, 2, 'Réseaux', '3ème année', 24, 'td', NULL, '2026-02-07 09:00:00', '2026-02-07 12:30:00', 'validee', NULL, '2026-02-05 21:13:24', '2026-02-05 21:13:34');
 
 -- --------------------------------------------------------
 
@@ -383,6 +410,27 @@ ALTER TABLE `document_demandes`
   ADD KEY `idx_etudiant_id` (`etudiant_id`),
   ADD KEY `idx_statut` (`statut`),
   ADD KEY `idx_date_demande` (`date_demande`);
+
+--
+-- Index pour la table `edt_sessions`
+--
+ALTER TABLE `edt_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_edt_slot` (`week_id`,`jour_date`,`slot`),
+  ADD KEY `idx_edt_week` (`week_id`),
+  ADD KEY `idx_edt_affect` (`affectation_id`),
+  ADD KEY `idx_edt_salle` (`salle_id`),
+  ADD KEY `idx_edt_day` (`jour_date`);
+
+--
+-- Index pour la table `edt_weeks`
+--
+ALTER TABLE `edt_weeks`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_edt_week` (`filiere_id`,`niveau_id`,`annee_scolaire`,`groupe`,`date_debut`,`date_fin`),
+  ADD KEY `idx_edt_week_month` (`annee_scolaire`,`mois`),
+  ADD KEY `idx_edt_week_class` (`filiere_id`,`niveau_id`,`annee_scolaire`,`groupe`),
+  ADD KEY `fk_edt_week_niveau` (`niveau_id`);
 
 --
 -- Index pour la table `enseignant`
@@ -480,31 +528,43 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT pour la table `cours`
 --
 ALTER TABLE `cours`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `document_demandes`
 --
 ALTER TABLE `document_demandes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT pour la table `edt_sessions`
+--
+ALTER TABLE `edt_sessions`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT pour la table `edt_weeks`
+--
+ALTER TABLE `edt_weeks`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `enseignant`
 --
 ALTER TABLE `enseignant`
-  MODIFY `ID-ENSEIGNANT` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID-ENSEIGNANT` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT pour la table `enseignant_affectations`
 --
 ALTER TABLE `enseignant_affectations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `etudiant`
 --
 ALTER TABLE `etudiant`
-  MODIFY `ID-ETUDIANT` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID-ETUDIANT` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `filieres`
@@ -516,13 +576,13 @@ ALTER TABLE `filieres`
 -- AUTO_INCREMENT pour la table `filiere_cours`
 --
 ALTER TABLE `filiere_cours`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `inscriptions`
 --
 ALTER TABLE `inscriptions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `niveaux`
@@ -534,13 +594,13 @@ ALTER TABLE `niveaux`
 -- AUTO_INCREMENT pour la table `presences`
 --
 ALTER TABLE `presences`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `reservations_salles`
 --
 ALTER TABLE `reservations_salles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `salles`
@@ -557,6 +617,21 @@ ALTER TABLE `salles`
 --
 ALTER TABLE `document_demandes`
   ADD CONSTRAINT `fk_doc_etudiant` FOREIGN KEY (`etudiant_id`) REFERENCES `etudiant` (`ID-ETUDIANT`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `edt_sessions`
+--
+ALTER TABLE `edt_sessions`
+  ADD CONSTRAINT `fk_edt_sess_aff` FOREIGN KEY (`affectation_id`) REFERENCES `enseignant_affectations` (`id`),
+  ADD CONSTRAINT `fk_edt_sess_salle` FOREIGN KEY (`salle_id`) REFERENCES `salles` (`id`),
+  ADD CONSTRAINT `fk_edt_sess_week` FOREIGN KEY (`week_id`) REFERENCES `edt_weeks` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `edt_weeks`
+--
+ALTER TABLE `edt_weeks`
+  ADD CONSTRAINT `fk_edt_week_filiere` FOREIGN KEY (`filiere_id`) REFERENCES `filieres` (`id`),
+  ADD CONSTRAINT `fk_edt_week_niveau` FOREIGN KEY (`niveau_id`) REFERENCES `niveaux` (`id`);
 
 --
 -- Contraintes pour la table `enseignant_affectations`

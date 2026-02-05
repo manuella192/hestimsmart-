@@ -77,7 +77,7 @@ if (!isset($_SESSION['enseignant_id']) && !isset($_SESSION['etudiant_id']) && !i
       overflow:hidden;
       display:flex;
       flex-direction:column;
-      height: calc(100vh - 80px); /* ← fixe la hauteur pour scroll interne */
+      height: calc(100vh - 80px); /* fixe la hauteur pour scroll interne */
       max-height: 90vh;
     }
 
@@ -166,7 +166,7 @@ if (!isset($_SESSION['enseignant_id']) && !isset($_SESSION['etudiant_id']) && !i
     .messages{
       flex: 1;
       padding: 18px;
-      overflow-y: auto;           /* ← SCROLL INTERNE ACTIVÉ ICI */
+      overflow-y: auto; /* scroll interne */
       background: radial-gradient(1200px 500px at 10% 0%, #eef2ff 0%, rgba(238,242,255,0) 55%),
                   radial-gradient(1200px 500px at 90% 0%, #eff6ff 0%, rgba(239,246,255,0) 55%);
     }
@@ -279,36 +279,36 @@ if (!isset($_SESSION['enseignant_id']) && !isset($_SESSION['etudiant_id']) && !i
         <div class="assistant-badge">
           <div class="dot" aria-hidden="true"></div>
           <div>
-            <strong>Assistant pédagogique</strong>
-            <span>Conseils, explications, aide sur le portail</span>
+            <strong>Assistant HESTIM</strong>
+            <span>Infos école, supports, liens, frais, contact</span>
           </div>
         </div>
 
         <div class="tools">
-          <button class="btn" id="btn-clear">Effacer</button>
-          <button class="btn primary" id="btn-suggest">Suggestion</button>
+          <button class="btn" id="btn-clear" type="button">Effacer</button>
+          <button class="btn primary" id="btn-suggest" type="button">Suggestion</button>
         </div>
       </div>
 
+      <!-- BOUTONS ADAPTÉS À TA BASE -->
       <div class="quick" id="quick">
-        <button class="chip" data-q="Explique-moi comment utiliser la section Étudiants inscrits.">Étudiants inscrits</button>
-        <button class="chip" data-q="Comment enregistrer une présence correctement ?">Présence</button>
-        <button class="chip" data-q="Comment faire une réservation de salle ?">Réservation</button>
-        <button class="chip" data-q="Je ne comprends pas une erreur, comment la diagnostiquer ?">Erreurs</button>
+        <button class="chip" data-q="Présente-moi HESTIM en quelques points." type="button">Présentation HESTIM</button>
+        <button class="chip" data-q="Donne-moi les liens utiles : site officiel, Moodle et Odoo." type="button">Liens utiles</button>
+        <button class="chip" data-q="Explique comment faire une demande de document dans la section Supports." type="button">Supports (documents)</button>
+        <button class="chip" data-q="Quels sont les frais de scolarité (formation initiale) ?" type="button">Frais de scolarité</button>
+        <button class="chip" data-q="Donne-moi les contacts officiels de HESTIM (téléphones et email)." type="button">Contact</button>
       </div>
 
       <div class="messages" id="messages">
         <div class="row bot">
-          <div class="bubble bot">
-Bonjour 👋  
-Je suis votre assistant. Posez votre question (ex: présence, cours, réservation, portail).
-          </div>
+          <div class="bubble bot">Bonjour 👋
+Je suis votre assistant HESTIM. Posez votre question (supports, liens, frais, contact...).</div>
         </div>
       </div>
 
       <div class="composer">
         <textarea id="input" class="input" rows="1" placeholder="Écrivez votre message..." aria-label="Message"></textarea>
-        <button id="send" class="send" aria-label="Envoyer" disabled>➤</button>
+        <button id="send" class="send" aria-label="Envoyer" disabled type="button">➤</button>
       </div>
     </div>
   </div>
@@ -351,7 +351,11 @@ Je suis votre assistant. Posez votre question (ex: présence, cours, réservatio
       sendBtn.disabled = inputEl.value.trim().length === 0;
     }
 
-    // Correction clé : on appelle setSendState à chaque input + focus
+    function autoGrow(el){
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 180) + 'px';
+    }
+
     inputEl.addEventListener('input', () => {
       autoGrow(inputEl);
       setSendState();
@@ -359,11 +363,6 @@ Je suis votre assistant. Posez votre question (ex: présence, cours, réservatio
 
     inputEl.addEventListener('focus', setSendState);
     inputEl.addEventListener('blur', setSendState);
-
-    function autoGrow(el){
-      el.style.height = 'auto';
-      el.style.height = Math.min(el.scrollHeight, 180) + 'px';
-    }
 
     async function callChat(message){
       const res = await fetch('/api/chat_proxy.php', {
@@ -427,15 +426,15 @@ Je suis votre assistant. Posez votre question (ex: présence, cours, réservatio
 
     clearBtn.addEventListener('click', () => {
       messagesEl.innerHTML = '';
-      addBubble("Bonjour 👋\nJe suis votre assistant. Posez votre question (ex: présence, cours, réservation, portail).", 'bot');
+      addBubble("Bonjour 👋\nJe suis votre assistant HESTIM. Posez votre question (supports, liens, frais, contact...).", 'bot');
     });
 
     suggestBtn.addEventListener('click', () => {
       const suggestions = [
-        "Explique-moi la différence entre affectation, cours, filière et niveau.",
-        "Donne-moi un checklist pour enregistrer la présence sans erreurs.",
-        "Comment filtrer la liste des étudiants efficacement ?",
-        "Quelles erreurs fréquentes et comment les corriger ?"
+        "Comment accéder à Moodle ?",
+        "Quels documents puis-je demander via Supports ?",
+        "Quels sont les frais de scolarité pour 1ère/2ème année ?",
+        "Donne-moi les contacts officiels de HESTIM."
       ];
       inputEl.value = suggestions[Math.floor(Math.random()*suggestions.length)];
       autoGrow(inputEl);
@@ -443,7 +442,7 @@ Je suis votre assistant. Posez votre question (ex: présence, cours, réservatio
       inputEl.focus();
     });
 
-    // Initialisation
+    // init
     autoGrow(inputEl);
     setSendState();
     inputEl.focus();

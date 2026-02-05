@@ -1,58 +1,131 @@
 {
-    "categories": [
-      {
-        "name": "Présentation",
-        "description": "Ce portail scolaire permet aux enseignants et étudiants de gérer les cours, réservations et présence.",
-        "details": [
-          { "item": "Rôles", "description": "Enseignant : voir ses cours, étudiants, présence, réservations. Étudiant : consulter ses infos, cours, présence (si activé). Admin : gérer affectations, salles, comptes." },
-          { "item": "Année scolaire", "description": "Toutes les requêtes utilisent une année scolaire (ex: 2025-2026). Vérifier qu’elle est cohérente partout." }
-        ],
-        "page_target": "Accueil"
-      },
-      {
-        "name": "Étudiants inscrits",
-        "description": "Liste les étudiants liés à une affectation (cours + filière + niveau + année + groupe).",
-        "details": [
-          { "item": "Filtre cours", "description": "Sélectionner un cours/affectation dans la liste pour charger les étudiants." },
-          { "item": "Recherche", "description": "Utiliser la barre de recherche pour filtrer par nom, email, filière, niveau ou groupe." },
-          { "item": "Problème fréquent", "description": "Si aucun étudiant ne s’affiche : vérifier affectation_id, annee_scolaire, et les inscriptions (filière/niveau/groupe)." }
-        ],
-        "page_target": "Étudiants"
-      },
-      {
-        "name": "Présence",
-        "description": "Permet d’enregistrer Présent/Absent pour une séance (date/heure) sur un groupe d’étudiants.",
-        "details": [
-          { "step_number": 1, "title": "Choisir un cours", "description": "Sélectionner une affectation (cours) avant de saisir la présence." },
-          { "step_number": 2, "title": "Choisir la séance", "description": "Sélectionner une date/heure valide (datetime-local)." },
-          { "step_number": 3, "title": "Marquer présent/absent", "description": "Pour chaque étudiant, cliquer Présent ou Absent. Modifiable avant envoi." },
-          { "step_number": 4, "title": "Enregistrer", "description": "Cliquer 'Enregistrer la présence' pour envoyer les données au serveur." },
-          { "step_number": 5, "title": "Erreurs fréquentes", "description": "ID étudiant manquant, affectation incorrecte, année scolaire différente, ou étudiants hors contexte (filière/niveau/groupe)." }
-        ],
-        "page_target": "Présence"
-      },
-      {
-        "name": "Réservation des salles",
-        "description": "Permet de réserver une salle/amphi selon bâtiment, type, période et effectif.",
-        "details": [
-          { "step_number": 1, "title": "Sélection salle", "description": "Choisir bâtiment + type pour charger la liste des salles disponibles." },
-          { "step_number": 2, "title": "Cours", "description": "Le nom du cours est automatique selon l’affectation de l’enseignant." },
-          { "step_number": 3, "title": "Dates", "description": "La fin doit être après le début. Sinon erreur de validation." },
-          { "step_number": 4, "title": "Statuts", "description": "en_attente, validee, rejetee, annulee. Seules les demandes en_attente peuvent être annulées." }
-        ],
-        "page_target": "Réservations"
-      },
-      {
-        "name": "Dépannage",
-        "description": "Méthodes simples pour diagnostiquer les problèmes du portail.",
-        "details": [
-          { "item": "Tester API", "description": "Vérifier le retour JSON de l’endpoint dans le navigateur (succès, message, data)." },
-          { "item": "Session", "description": "Si 'Session expirée' : vérifier que l’utilisateur est connecté et que la session PHP fonctionne." },
-          { "item": "Erreur 500", "description": "Vérifier les logs PHP/serveur et les logs du service chatbot (chatbot_ai/logs/chatbot.log)." },
-          { "item": "Proxy chat", "description": "Si le chat échoue : vérifier que Flask tourne sur 127.0.0.1:5000 et que /api/chat_proxy.php pointe vers la bonne URL." }
-        ],
-        "page_target": "Support"
-      }
-    ]
-  }
-  
+  "categories": [
+    {
+      "name": "Présentation HESTIM",
+      "description": "HESTIM est un établissement d’enseignement supérieur reconnu par l’État marocain. Il forme des ingénieurs et des managers via deux pôles : École d’Ingénierie et Business School.",
+      "details": [
+        {
+          "item": "Mission",
+          "description": "Former des ingénieurs et managers compétents, responsables et ouverts sur le monde, et accompagner la performance des organisations."
+        },
+        {
+          "item": "Valeurs",
+          "description": "Excellence, Innovation, Bienveillance, Engagement, Éco-responsabilité."
+        },
+        {
+          "item": "Campus",
+          "description": "Deux campus proches à Casablanca, accessibles via transports en commun."
+        }
+      ],
+      "page_target": "À propos"
+    },
+    {
+      "name": "Liens utiles",
+      "description": "Accès aux plateformes officielles de HESTIM.",
+      "details": [
+        {
+          "item": "Site officiel",
+          "description": "https://www.hestim.ma/"
+        },
+        {
+          "item": "Moodle (E-learning)",
+          "description": "https://elearning.hestim.ma/moodle/login/index.php"
+        },
+        {
+          "item": "Odoo (Candidature/Portail)",
+          "description": "https://candidature.hestim.ma/portal_com/login"
+        }
+      ],
+      "page_target": "Accueil"
+    },
+    {
+      "name": "Supports",
+      "description": "La section Supports permet aux étudiants de faire une demande de document administratif.",
+      "details": [
+        {
+          "step_number": 1,
+          "title": "Ouvrir Supports",
+          "description": "Aller dans la section Supports."
+        },
+        {
+          "step_number": 2,
+          "title": "Choisir le type de document",
+          "description": "Sélectionner : Homologation, Bulletin, Certificat de scolarité, ou Autre."
+        },
+        {
+          "step_number": 3,
+          "title": "Si Autre",
+          "description": "Renseigner le nom exact du document demandé (ex : Attestation de stage, Relevé de notes)."
+        },
+        {
+          "step_number": 4,
+          "title": "Commentaire (optionnel)",
+          "description": "Ajouter une précision si nécessaire (ex : urgent, pour dossier, etc.)."
+        },
+        {
+          "step_number": 5,
+          "title": "Envoyer la demande",
+          "description": "Cliquer sur Envoyer la demande puis attendre le message de confirmation."
+        }
+      ],
+      "page_target": "Supports"
+    },
+    {
+      "name": "Scolarité et support",
+      "description": "Informations générales sur la scolarité et l’assistance en cas de problème.",
+      "details": [
+        {
+          "item": "Problème scolarité",
+          "description": "Si vous avez un problème lié à la scolarité (inscription, documents, situation), contactez l’administration/scolarité."
+        },
+        {
+          "item": "Problème technique portail",
+          "description": "Si le portail affiche une erreur (session expirée, page blanche, erreur serveur), contactez le support/administration."
+        },
+        {
+          "item": "Conseil",
+          "description": "Avant de signaler un problème, notez le message d’erreur exact et la page concernée."
+        }
+      ],
+      "page_target": "Support"
+    },
+    {
+      "name": "Frais de scolarité",
+      "description": "Frais de scolarité (formation initiale) selon le niveau.",
+      "details": [
+        {
+          "item": "1ère et 2ème année",
+          "description": "42 000 dirhams."
+        },
+        {
+          "item": "3ème à 5ème année",
+          "description": "45 000 dirhams."
+        },
+        {
+          "item": "Double diplomation",
+          "description": "Non couvert ici (frais spécifiques non inclus)."
+        }
+      ],
+      "page_target": "Scolarité"
+    },
+    {
+      "name": "Contact HESTIM",
+      "description": "Coordonnées officielles.",
+      "details": [
+        {
+          "item": "Téléphone 1",
+          "description": "+212 5 22 34 17 23"
+        },
+        {
+          "item": "Téléphone 2",
+          "description": "+212 6 61 53 62 55"
+        },
+        {
+          "item": "Email",
+          "description": "contact@hestim.ma"
+        }
+      ],
+      "page_target": "Contact"
+    }
+  ]
+}

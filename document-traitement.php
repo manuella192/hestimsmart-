@@ -79,14 +79,14 @@ try {
 
     // ---- Envoi email admin (PHPMailer) ----
     // IMPORTANT: tu dois renseigner SMTP_USER/SMTP_PASS (mot de passe d'application Gmail)
-    $ADMIN_EMAIL = "dmtwoleu@gmail.com";
+    $ADMIN_EMAIL = "manuellamht@gmail.com";
 
     $mail = new PHPMailer(true);
     try {
         // SMTP Gmail (recommandé)
         $SMTP_HOST = "smtp.gmail.com";
         $SMTP_USER = "dmtwoleu@gmail.com";
-        $SMTP_PASS = "ftln gwiz epvs mzko"; // <- mot de passe d'application
+        $SMTP_PASS = "ftln gwiz epvs mzko"; 
         $SMTP_PORT = 587;
 
         $mail->isSMTP();

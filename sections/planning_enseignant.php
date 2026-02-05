@@ -1,10 +1,13 @@
 <?php
 // ===========================
-// FICHIER: sections/planning.php  (ETUDIANT - VERSION ASYNC)
+// FICHIER: sections/planning_enseignant.php (ou include dans portail_enseignant)
+// VERSION ASYNC (sans reload) + affiche 👤 Nom enseignant (TOUJOURS, même en navigation)
+// IMPORTANT: nécessite le backend JSON "enseignant_edt_week_get.php" qui renvoie aussi enseignant_nom
 // ===========================
-session_start();
 
-if (!isset($_SESSION['etudiant_id'])) {
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+if (!isset($_SESSION['enseignant_id'])) {
   http_response_code(401);
   echo "<p>Session expirée. Veuillez vous reconnecter.</p>";
   exit;
@@ -21,157 +24,134 @@ $slots = [
   "A2" => ["label"=>"15:30 — 17:00"],
 ];
 
-// petite fonction pour retrouver index jour (Lun=0..Ven=4)
 function dayIndex($isoDate){
-  $n = (int)date('N', strtotime($isoDate)); // 1=lundi ... 7=dimanche
+  $n = (int)date('N', strtotime($isoDate)); // 1=lun ... 7=dim
   return $n - 1;
 }
 
-// Choix semaine via ?week_id=...
+// week_id initial (si présent)
 $weekId = (int)($_GET['week_id'] ?? 0);
 
 require_once __DIR__ . '/../db.php';
 
-$etudiant_id = (int)$_SESSION['etudiant_id'];
+$enseignant_id = (int)$_SESSION['enseignant_id'];
 
-// 1) inscription (filiere/niveau/annee)
-$stmt = $conn->prepare("
-  SELECT filiere_id, niveau_id, annee_scolaire
-  FROM inscriptions
-  WHERE etudiant_id=:eid
-  ORDER BY date_inscription DESC
-  LIMIT 1
-");
-$stmt->execute([':eid'=>$etudiant_id]);
-$insc = $stmt->fetch(PDO::FETCH_ASSOC);
+// Nom enseignant initial (pour rendu SSR)
+$enseignant_nom = trim(($_SESSION['enseignant_prenom'] ?? '') . ' ' . ($_SESSION['enseignant_nom'] ?? ''));
+if ($enseignant_nom === '') {
+  try {
+    $t = $conn->prepare("SELECT CONCAT_WS(' ', PRENOM, NOM) AS nom FROM enseignant WHERE `ID-ENSEIGNANT`=:id LIMIT 1");
+    $t->execute([':id'=>$enseignant_id]);
+    $enseignant_nom = (string)($t->fetchColumn() ?: '');
+  } catch (Throwable $e) {
+    $enseignant_nom = '';
+  }
+}
 
 $week = null;
 $sessions = [];
 $prevWeekId = null;
 $nextWeekId = null;
 
-$weeksList = [];   // toutes les semaines dispo (pour dropdown)
-$totalWeeks = 0;   // total
-$currentIndex = 0; // position (1..total)
+$weeksList = [];
+$totalWeeks = 0;
+$currentIndex = 0;
 
-if ($insc) {
-  $filiere_id = (int)$insc['filiere_id'];
-  $niveau_id  = (int)$insc['niveau_id'];
-  $annee      = trim($insc['annee_scolaire']);
+/**
+ * 1) Liste des semaines où cet enseignant a au moins 1 séance
+ */
+$lStmt = $conn->prepare("
+  SELECT DISTINCT w.id, w.label, w.date_debut, w.date_fin
+  FROM edt_weeks w
+  INNER JOIN edt_sessions s ON s.week_id = w.id
+  INNER JOIN enseignant_affectations ea ON ea.id = s.affectation_id
+  WHERE ea.enseignant_id = :eid
+  ORDER BY w.date_debut ASC
+");
+$lStmt->execute([':eid'=>$enseignant_id]);
+$weeksList = $lStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$totalWeeks = count($weeksList);
 
-  // 2) Charger semaine
-  if ($weekId > 0) {
-    // sécurité: week_id doit correspondre à filiere/niveau/annee
-    $wStmt = $conn->prepare("
-      SELECT *
-      FROM edt_weeks
-      WHERE id=:wid AND filiere_id=:f AND niveau_id=:n AND annee_scolaire=:a
-      LIMIT 1
-    ");
-    $wStmt->execute([':wid'=>$weekId, ':f'=>$filiere_id, ':n'=>$niveau_id, ':a'=>$annee]);
+$allowedWeekIds = array_map(fn($w)=> (int)$w['id'], $weeksList);
+
+/**
+ * 2) Choisir la semaine
+ */
+if ($totalWeeks > 0) {
+  if ($weekId > 0 && in_array($weekId, $allowedWeekIds, true)) {
+    $wStmt = $conn->prepare("SELECT * FROM edt_weeks WHERE id=:wid LIMIT 1");
+    $wStmt->execute([':wid'=>$weekId]);
     $week = $wStmt->fetch(PDO::FETCH_ASSOC);
-    if (!$week) $weekId = 0;
   }
 
-  if ($weekId <= 0) {
-    // semaine courante
+  if (!$week) {
+    // semaine courante accessible
     $wStmt = $conn->prepare("
-      SELECT *
-      FROM edt_weeks
-      WHERE filiere_id=:f AND niveau_id=:n AND annee_scolaire=:a
-        AND CURDATE() BETWEEN date_debut AND date_fin
-      ORDER BY date_debut DESC
+      SELECT w.*
+      FROM edt_weeks w
+      INNER JOIN edt_sessions s ON s.week_id = w.id
+      INNER JOIN enseignant_affectations ea ON ea.id = s.affectation_id
+      WHERE ea.enseignant_id = :eid
+        AND CURDATE() BETWEEN w.date_debut AND w.date_fin
+      ORDER BY w.date_debut DESC
       LIMIT 1
     ");
-    $wStmt->execute([':f'=>$filiere_id, ':n'=>$niveau_id, ':a'=>$annee]);
+    $wStmt->execute([':eid'=>$enseignant_id]);
     $week = $wStmt->fetch(PDO::FETCH_ASSOC);
 
-    // fallback: dernière semaine existante
+    // fallback: dernière accessible
     if (!$week) {
       $wStmt2 = $conn->prepare("
-        SELECT *
-        FROM edt_weeks
-        WHERE filiere_id=:f AND niveau_id=:n AND annee_scolaire=:a
-        ORDER BY date_debut DESC
+        SELECT w.*
+        FROM edt_weeks w
+        INNER JOIN edt_sessions s ON s.week_id = w.id
+        INNER JOIN enseignant_affectations ea ON ea.id = s.affectation_id
+        WHERE ea.enseignant_id = :eid
+        ORDER BY w.date_debut DESC
         LIMIT 1
       ");
-      $wStmt2->execute([':f'=>$filiere_id, ':n'=>$niveau_id, ':a'=>$annee]);
+      $wStmt2->execute([':eid'=>$enseignant_id]);
       $week = $wStmt2->fetch(PDO::FETCH_ASSOC);
     }
   }
+}
 
-  // 3) Liste des semaines (dropdown + X/Y)
-  $lStmt = $conn->prepare("
-    SELECT id, label, date_debut, date_fin
-    FROM edt_weeks
-    WHERE filiere_id=:f AND niveau_id=:n AND annee_scolaire=:a
-    ORDER BY date_debut ASC
-  ");
-  $lStmt->execute([':f'=>$filiere_id, ':n'=>$niveau_id, ':a'=>$annee]);
-  $weeksList = $lStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  $totalWeeks = count($weeksList);
-
-  if ($week && $totalWeeks > 0) {
-    foreach ($weeksList as $idx => $w) {
-      if ((int)$w['id'] === (int)$week['id']) {
-        $currentIndex = $idx + 1; // 1..N
-        break;
-      }
+/**
+ * 3) Index + prev/next DANS la liste accessible (weeksList)
+ */
+if ($week && $totalWeeks > 0) {
+  foreach ($weeksList as $idx => $w) {
+    if ((int)$w['id'] === (int)$week['id']) {
+      $currentIndex = $idx + 1;
+      $prevWeekId = ($idx > 0) ? (int)$weeksList[$idx-1]['id'] : null;
+      $nextWeekId = ($idx < $totalWeeks-1) ? (int)$weeksList[$idx+1]['id'] : null;
+      break;
     }
-  }
-
-  // 4) Sessions + prev/next
-  if ($week) {
-    $sStmt = $conn->prepare("
-      SELECT
-        s.jour_date, s.slot,
-        c.nom AS cours_nom,
-        CONCAT_WS(' ', e.PRENOM, e.NOM) AS enseignant_nom,
-        sa.batiment, sa.nom AS salle_nom
-      FROM edt_sessions s
-      INNER JOIN enseignant_affectations ea ON ea.id = s.affectation_id
-      INNER JOIN cours c ON c.id = ea.cours_id
-      INNER JOIN enseignant e ON e.`ID-ENSEIGNANT` = ea.enseignant_id
-      INNER JOIN salles sa ON sa.id = s.salle_id
-      WHERE s.week_id = :wid
-      ORDER BY s.jour_date, FIELD(s.slot,'M1','M2','A1','A2')
-    ");
-    $sStmt->execute([':wid'=>(int)$week['id']]);
-    $sessions = $sStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // prev: date_fin < date_debut actuelle
-    $pStmt = $conn->prepare("
-      SELECT id
-      FROM edt_weeks
-      WHERE filiere_id=:f AND niveau_id=:n AND annee_scolaire=:a
-        AND date_fin < :cur_start
-      ORDER BY date_debut DESC
-      LIMIT 1
-    ");
-    $pStmt->execute([
-      ':f'=>$filiere_id, ':n'=>$niveau_id, ':a'=>$annee,
-      ':cur_start'=>$week['date_debut']
-    ]);
-    $prevWeekId = $pStmt->fetchColumn() ?: null;
-
-    // next: date_debut > date_fin actuelle
-    $nStmt = $conn->prepare("
-      SELECT id
-      FROM edt_weeks
-      WHERE filiere_id=:f AND niveau_id=:n AND annee_scolaire=:a
-        AND date_debut > :cur_end
-      ORDER BY date_debut ASC
-      LIMIT 1
-    ");
-    $nStmt->execute([
-      ':f'=>$filiere_id, ':n'=>$niveau_id, ':a'=>$annee,
-      ':cur_end'=>$week['date_fin']
-    ]);
-    $nextWeekId = $nStmt->fetchColumn() ?: null;
   }
 }
 
-// 5) Construire $events[slot][dayIndex]
+/**
+ * 4) Sessions filtrées pour CET enseignant + semaine choisie
+ */
+if ($week) {
+  $sStmt = $conn->prepare("
+    SELECT
+      s.jour_date, s.slot,
+      c.nom AS cours_nom,
+      sa.batiment, sa.nom AS salle_nom
+    FROM edt_sessions s
+    INNER JOIN enseignant_affectations ea ON ea.id = s.affectation_id
+    INNER JOIN cours c ON c.id = ea.cours_id
+    INNER JOIN salles sa ON sa.id = s.salle_id
+    WHERE s.week_id = :wid
+      AND ea.enseignant_id = :eid
+    ORDER BY s.jour_date, FIELD(s.slot,'M1','M2','A1','A2')
+  ");
+  $sStmt->execute([':wid'=>(int)$week['id'], ':eid'=>$enseignant_id]);
+  $sessions = $sStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// 5) Construire events[slot][dayIndex]
 $events = [];
 foreach ($slots as $k => $_) $events[$k] = array_fill(0, 5, null);
 
@@ -184,7 +164,7 @@ foreach ($sessions as $s) {
   $events[$slot][$i] = [
     'matiere' => $s['cours_nom'],
     'type'    => $slot,
-    'prof'    => $s['enseignant_nom'],
+    'prof'    => $enseignant_nom, // 👤 Nom enseignant (SSR)
     'salle'   => $s['batiment'] . ' - ' . $s['salle_nom'],
     'color'   => 'blue'
   ];
@@ -197,11 +177,7 @@ $weekLabel = $week
 
 <link rel="stylesheet" href="css/planning.css">
 
-<div class="header" style="margin-bottom: 16px; margin-top: 16px;">
-  <h2 style="margin:0;">Planning</h2>
-</div>
-
-<section class="emploi-container">
+<section class="emploi-container" id="planningEnseignantRoot">
   <div class="planning-topbar">
     <div>
       <div class="planning-week" id="weekLabel"><?= esc($weekLabel) ?></div>
@@ -268,7 +244,9 @@ $weekLabel = $week
                     <span><?= esc($ev['type']) ?></span>
                     <span><?= esc($ev['salle']) ?></span>
                   </div>
-                  <div class="cours-prof">👤 <?= esc($ev['prof']) ?></div>
+                  <?php if(!empty($ev['prof'])): ?>
+                    <div class="cours-prof">👤 <?= esc($ev['prof']) ?></div>
+                  <?php endif; ?>
                 </div>
               </div>
             <?php else: ?>
@@ -281,7 +259,7 @@ $weekLabel = $week
   </div>
 
   <?php if(!$week): ?>
-    <div style="padding:12px;color:#b30000;">Aucun emploi du temps enregistré pour ta filière/niveau.</div>
+    <div style="padding:12px;color:#b30000;">Aucun emploi du temps enregistré pour vous.</div>
   <?php endif; ?>
 </section>
 
@@ -292,6 +270,9 @@ $weekLabel = $week
   const weekSelect = document.getElementById('weekSelect');
   const weekLabelEl = document.getElementById('weekLabel');
   const weekCounterEl = document.getElementById('weekCounter');
+
+  // ✅ garde une "source de vérité" du nom enseignant (SSR -> puis mise à jour via API)
+  let TEACHER_NAME = <?= json_encode($enseignant_nom, JSON_UNESCAPED_UNICODE) ?>;
 
   function escHtml(str){
     return String(str ?? '')
@@ -305,30 +286,31 @@ $weekLabel = $week
   function dayIndex(isoDate){
     // isoDate = "YYYY-MM-DD"
     const d = new Date(isoDate + 'T00:00:00');
-    // JS: 0=dim ... 6=sam ; on veut Lun=0..Ven=4
-    const n = d.getDay(); // lun=1 ... ven=5
-    return n - 1;
+    const n = d.getDay(); // 0=dim..6=sam ; lun=1..ven=5
+    return n - 1;         // lun=>0 .. ven=>4
   }
 
   function clearGrid(){
-    document.querySelectorAll('.grid-cell').forEach(cell => {
+    document.querySelectorAll('#planningEnseignantRoot .grid-cell').forEach(cell => {
       cell.innerHTML = `<div class="empty-slot">—</div>`;
     });
   }
 
-  function renderEvent(slot, dayIdx, ev){
-    const cell = document.querySelector(`.grid-cell[data-slot="${slot}"][data-day="${dayIdx}"]`);
+  function renderEvent(slot, dayIdx, s){
+    const cell = document.querySelector(`#planningEnseignantRoot .grid-cell[data-slot="${slot}"][data-day="${dayIdx}"]`);
     if(!cell) return;
+
+    const profName = (s.enseignant_nom && String(s.enseignant_nom).trim()) ? s.enseignant_nom : TEACHER_NAME;
 
     cell.innerHTML = `
       <div class="cours-cell cours-blue">
         <div class="cours-info">
-          <div class="cours-matiere">${escHtml(ev.cours_nom)}</div>
+          <div class="cours-matiere">${escHtml(s.cours_nom)}</div>
           <div class="cours-details">
-            <span>${escHtml(ev.slot)}</span>
-            <span>${escHtml(ev.batiment)} - ${escHtml(ev.salle_nom)}</span>
+            <span>${escHtml(s.slot)}</span>
+            <span>${escHtml(s.batiment)} - ${escHtml(s.salle_nom)}</span>
           </div>
-          <div class="cours-prof">👤 ${escHtml(ev.enseignant_nom)}</div>
+          ${profName ? `<div class="cours-prof">👤 ${escHtml(profName)}</div>` : ``}
         </div>
       </div>
     `;
@@ -347,7 +329,6 @@ $weekLabel = $week
 
   function computePrevNextFromSelect(currentWeekId){
     if(!weekSelect) return {prev:null, next:null, idx:0, total:0};
-
     const ids = Array.from(weekSelect.options).map(o => Number(o.value));
     const idx = ids.indexOf(Number(currentWeekId));
     const prev = (idx > 0) ? ids[idx-1] : null;
@@ -360,7 +341,7 @@ $weekLabel = $week
     if(weekLabelEl) weekLabelEl.textContent = 'Chargement...';
     if(weekCounterEl) weekCounterEl.textContent = '';
 
-    const url = new URL('etudiant_edt_week_get.php', window.location.href);
+    const url = new URL('enseignant_edt_week_get.php', window.location.href);
     if(weekId) url.searchParams.set('week_id', String(weekId));
 
     const res = await fetch(url.toString(), { credentials:'same-origin' });
@@ -379,6 +360,11 @@ $weekLabel = $week
     const week = payload.week;
     const sessions = payload.sessions || [];
 
+    // ✅ IMPORTANT: le backend renvoie enseignant_nom -> on le conserve
+    if (payload.enseignant_nom && String(payload.enseignant_nom).trim()) {
+      TEACHER_NAME = String(payload.enseignant_nom).trim();
+    }
+
     if(!week){
       if(weekLabelEl) weekLabelEl.textContent = "Aucune semaine trouvée";
       setNav(null, null);
@@ -390,7 +376,7 @@ $weekLabel = $week
 
     if(weekSelect) weekSelect.value = String(week.id);
 
-    // prev/next + compteur (calculé depuis le select existant)
+    // prev/next + compteur (calculé depuis le select)
     const nav = computePrevNextFromSelect(week.id);
     setNav(nav.prev, nav.next);
     if(weekCounterEl && nav.total){
@@ -404,7 +390,7 @@ $weekLabel = $week
       renderEvent(s.slot, i, s);
     });
 
-    // URL sans reload (pour copier/coller et navigation back/forward)
+    // URL sans reload
     if(pushUrl){
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.set('week_id', String(week.id));
@@ -437,12 +423,5 @@ $weekLabel = $week
     const wid = (e.state && e.state.week_id) ? Number(e.state.week_id) : null;
     loadWeek(wid, false);
   });
-
-  // Optionnel:
-  // Si tu veux forcer un rendu AJAX au premier affichage (même si PHP a déjà rendu),
-  // décommente la ligne ci-dessous :
-  // const initId = Number(new URLSearchParams(window.location.search).get('week_id') || (weekSelect ? weekSelect.value : 0));
-  // if(initId) loadWeek(initId, false);
-
 })();
 </script>

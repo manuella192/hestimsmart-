@@ -1,163 +1,217 @@
 /* ============================================
-   PLANNING ÉTUDIANT - Style spécifique
-   Compatible avec le style principal du site
+   PLANNING ÉTUDIANT - Style spécifique (V2)
+   Garde les couleurs de ton ancien planning
+   + corrige le débordement (scroll horizontal propre)
 ============================================ */
 
-/* Conteneur principal */
-.emploi-container {
+:root{
+    --blue: #0b2d72;
+    --blue2: #131564;
+    --border: #c5c5db;
+    --soft: #f5f7fa;
+    --rowEven: #fafafa;
+  }
+  
+  /* Conteneur principal */
+  .emploi-container {
     background: #ffffff;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     border: 1px solid #eaeaea;
     margin: 0 30px 30px 30px;
-}
-
-/* En-tête */
-.header {
+  }
+  
+  /* En-tête */
+  .header {
     margin: 0 30px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #c5c5db;
-}
-
-.header h2 {
-    color: #0b2d72;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .header h2 {
+    color: var(--blue);
     font-size: 24px;
     margin: 0;
-}
-
-/* Tableau d'emploi du temps */
-.emploi-table {
-    width: 100%;
-    border-collapse: collapse;
+  }
+  
+  /* Top bar semaine */
+  .planning-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom: 14px;
+  }
+  
+  .planning-week{
+    color: #0b1a42;
+    font-weight: 700;
+  }
+  
+  .planning-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  
+  .btn-ghost{
+    border:1px solid #e6e6e6;
+    background:#fff;
+    border-radius:10px;
+    padding:10px 12px;
+    cursor:pointer;
+    font-weight:600;
+    color:#111;
+  }
+  .btn-ghost:hover{ background:#fafafa; }
+  
+  /* WRAPPER anti-débordement */
+  .planning-scroll{
+    width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+  }
+  
+  /* Grid planning (semaine) */
+  .planning-grid{
+    /* largeur min pour éviter que tout se compresse trop */
+    min-width: 980px;
+    display:grid;
+    grid-template-columns: 160px repeat(5, minmax(140px, 1fr));
+    gap:0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow:hidden;
     font-family: Arial, sans-serif;
-}
-
-.emploi-table th {
-    background: #0b2d72;
-    color: white;
+  }
+  
+  /* Header de colonne */
+  .grid-head{
+    background: var(--blue);
+    color:#fff;
     padding: 15px 10px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.emploi-table th:first-child {
-    background: #131564;
-    text-align: left;
+    text-align:center;
+    font-weight:600;
+    font-size:15px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+  .grid-head.grid-corner{
+    background: var(--blue2);
+    text-align:left;
     padding-left: 20px;
-}
-
-.emploi-table td {
+  }
+  
+  /* Colonne horaires */
+  .grid-time{
+    background: var(--soft);
+    font-weight:600;
+    color:#0b1a42;
+    text-align:left;
     padding: 15px 10px;
-    border: 1px solid #c5c5db;
-    text-align: center;
-    vertical-align: top;
-    height: 60px;
-    position: relative;
+    padding-left: 20px;
+    border-top: 1px solid var(--border);
+    border-right: 2px solid var(--border);
+    display:flex;
+    align-items:center;
+  }
+  .time-chip{
+    display:inline-block;
+  }
+  
+  /* Cellule */
+  .grid-cell{
+    padding: 10px;
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    min-height: 86px;
+    background:#fff;
     transition: background-color 0.2s;
-}
-
-.emploi-table td:first-child {
-    background: #f5f7fa;
-    font-weight: 600;
-    color: #0b1a42;
-    text-align: left;
-    padding-left: 20px;
-    border-right: 2px solid #c5c5db;
-}
-
-.emploi-table tr:nth-child(even) td:not(:first-child) {
-    background: #fafafa;
-}
-
-.emploi-table tr:hover td:not(:first-child) {
+  }
+  
+  /* Alternance “ligne” : comme ton tableau */
+  .planning-grid > .grid-time:nth-of-type(even) ~ .grid-cell{
+    /* on ne peut pas cibler parfaitement chaque ligne en pur CSS,
+       donc on applique un léger fond via :hover uniquement */
+  }
+  
+  .grid-cell:hover{
     background: rgba(11, 45, 114, 0.05);
-}
-
-/* Cellules avec cours (exemple pour dynamique future) */
-.cours-cell {
-    background: rgba(19, 21, 100, 0.1) !important;
-    border: 1px solid rgba(19, 21, 100, 0.3) !important;
+  }
+  
+  /* Vide */
+  .empty-slot{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#bbb;
+    font-weight:700;
+  }
+  
+  /* ====== Carte cours : on garde ton look ====== */
+  .cours-cell {
+    background: rgba(19, 21, 100, 0.08);
+    border: 1px solid rgba(19, 21, 100, 0.25);
     border-radius: 6px;
-    padding: 8px;
-    margin: 2px 0;
+    padding: 10px;
     cursor: pointer;
-}
-
-.cours-cell:hover {
-    background: rgba(19, 21, 100, 0.15) !important;
-}
-
-.cours-info {
-    font-size: 13px;
-    color: #0b1a42;
-}
-
-.cours-matiere {
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.cours-details {
+    height: 100%;
+  }
+  
+  .cours-cell:hover {
+    background: rgba(19, 21, 100, 0.12);
+  }
+  
+  .cours-info { font-size: 13px; color: #0b1a42; }
+  .cours-matiere { font-weight: 700; margin-bottom: 6px; }
+  .cours-details {
     font-size: 12px;
     color: #666;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom: 6px;
+  }
+  .cours-prof{
+    font-size: 12px;
+    color:#0b1a42;
+    opacity: .9;
+  }
+  
+  /* ====== Codes couleur (compat avec tes events color) ====== */
+  .cours-blue   { border-left: 6px solid #0b2d72; }
+  .cours-green  { border-left: 6px solid #1f9d55; }
+  .cours-orange { border-left: 6px solid #f59e0b; }
+  .cours-red    { border-left: 6px solid #dc2626; }
+  .cours-purple { border-left: 6px solid #7c3aed; }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
     .emploi-container {
-        margin: 0 15px 20px 15px;
-        padding: 15px;
-        overflow-x: auto;
+      margin: 0 15px 20px 15px;
+      padding: 15px;
     }
-    
-    .emploi-table {
-        min-width: 800px;
-    }
-    
-    .header {
-        margin: 0 15px;
-    }
-}
-
-@media (max-width: 768px) {
-    .emploi-table th,
-    .emploi-table td {
-        padding: 12px 6px;
-        font-size: 14px;
-    }
-    
-    .emploi-table td:first-child {
-        padding-left: 10px;
-    }
-    
-    .header h2 {
-        font-size: 22px;
-    }
-}
-
-@media (max-width: 480px) {
+    .header { margin: 0 15px; }
+    .planning-grid { min-width: 920px; }
+  }
+  
+  @media (max-width: 768px) {
+    .header h2 { font-size: 22px; }
+    .grid-head{ font-size: 14px; padding: 12px 8px; }
+    .grid-time{ padding: 12px 8px; padding-left: 12px; }
+    .grid-cell{ padding: 8px; }
+  }
+  
+  @media (max-width: 480px) {
     .emploi-container {
-        margin: 0 10px 15px 10px;
-        padding: 10px;
+      margin: 0 10px 15px 10px;
+      padding: 10px;
     }
-    
-    .emploi-table th,
-    .emploi-table td {
-        padding: 10px 4px;
-        font-size: 13px;
-    }
-    
-    .emploi-table td:first-child {
-        padding-left: 8px;
-        font-size: 12px;
-    }
-    
-    .header h2 {
-        font-size: 20px;
-    }
-}
+    .header h2 { font-size: 20px; }
+  }
+  
