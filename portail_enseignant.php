@@ -4,7 +4,7 @@
 // ===========================
 session_start();
 if (!isset($_SESSION['enseignant_id'])) {
-    header("Location: login-enseignant.html");
+    header("Location: login-enseignant.php");
     exit;
 }
 
